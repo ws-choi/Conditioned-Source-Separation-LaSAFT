@@ -42,7 +42,7 @@ def eval(param):
         args['checkpoint_callback'] = False
         args['early_stop_callback'] = False
     elif log == 'wandb':
-        args['logger'] = WandbLogger(project='round_3', tags=args['model'], offline=False,
+        args['logger'] = WandbLogger(project='lasaft', tags=args['model'], offline=False,
                                      id=args['run_id'] + '_eval_' + args['epoch'].replace('=','_'))
         args['logger'].log_hyperparams(model.hparams)
         args['logger'].watch(model, log='all')

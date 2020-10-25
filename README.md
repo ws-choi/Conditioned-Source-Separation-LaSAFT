@@ -41,6 +41,65 @@ conda activate yourcondaname
 
 ### 2. Training a default CUNet
 
+```shell script
+python main.py 
+    --problem_name conditioned_separation
+    --model CUNET_TFC_GPoCM_LaSAFT
+    --mode train
+
+    --run_id cunet_tfc_gpocm_lasaft
+    --log False
+    
+    --musdb_root ../repos/musdb18_wav
+    --musdb_is_wav True
+    --filed_mode True
+    
+    --gpus 1
+    --precision 16
+    --batch_size 8
+    --num_workers 8
+    --pin_memory True
+    --save_top_k 3
+    --save_weights_only True
+    --patience 50
+    --min_epochs 100
+
+    --train_loss spec_mse
+    --val_loss raw_l1
+    
+    --optimizer adam
+    --lr 0.001
+    
+    --n_fft 2048
+    --hop_length 1024
+    --num_frame 128
+    --spec_type complex
+    --spec_est_mode mapping
+    --first_conv_activation relu
+    --last_activation identity
+    --input_channels 4
+    
+    --control_vector_type embedding
+    --control_input_dim 4
+    --embedding_dim 32
+    --condition_to decoder
+    
+    --n_blocks 7
+    --internal_channels 24
+    --n_internal_layers 5
+    --kernel_size_t 3 
+    --kernel_size_f 3 
+    --tfc_tdf_bias True
+    --num_tdfs 6
+    --dk 32
+    
+    --control_n_layer 4
+    --control_type dense
+    --pocm_type matmul
+    --pocm_norm batch_norm
+    
+    --seed 2020
+```
 
 ### 3. Evaluation
 

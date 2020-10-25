@@ -4,7 +4,6 @@ from warnings import warn
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.loggers import WandbLogger
 
-
 from pathlib import Path
 from pytorch_lightning import Trainer, seed_everything
 
@@ -14,19 +13,15 @@ from lasaft.utils.functions import mkdir_if_not_exists
 
 
 def train(param):
-
     if not isinstance(param, dict):
         args = vars(param)
     else:
         args = param
 
-    # MODEL
-    ##########################################################
-    # # # get framework
     framework = get_class_by_name('conditioned_separation', args['model'])
     if args['spec_type'] != 'magnitude':
         args['input_channels'] = 4
-    # # # Model instantiation
+
     model = framework(**args)
 
     if args['last_activation'] != 'identity' and args['spec_est_mode'] != 'masking':
@@ -79,7 +74,7 @@ def train(param):
     if log == 'False':
         args['logger'] = False
     elif log == 'wandb':
-        args['logger'] = WandbLogger(project='round_3', tags=args['model'], offline=False, id=run_id)
+        args['logger'] = WandbLogger(project='lasaft', tags=args['model'], offline=False, id=run_id)
         args['logger'].log_hyperparams(model.hparams)
         args['logger'].watch(model, log='all')
     elif log == 'tensorboard':
@@ -98,7 +93,6 @@ def train(param):
     ##########################################################
     # Trainer Definition
 
-
     # Trainer
     trainer = Trainer(**trainer_kwargs)
     n_fft, hop_length, num_frame = args['n_fft'], args['hop_length'], args['num_frame']
@@ -116,8 +110,12 @@ def train(param):
         print('new_lr_suggestion:', new_lr)
         return 0
 
-    seed_everything(2020)
     print(model)
+
+    if args['resume_from_checkpoint'] is None:
+        if args['seed'] is not None:
+            seed_everything(args['seed'])
+
     trainer.fit(model, train_data_loader, valid_data_loader)
 
     return None
