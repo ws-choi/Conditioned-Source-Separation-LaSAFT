@@ -261,3 +261,11 @@ Please see this [document](https://github.com/ws-choi/ISMIR2020_U_Nets_SVS/blob/
 ## Reference
 
 [1]  Woosung Choi,  Minseok Kim,  Jaehwa Chung, and Soonyoung Jung, “LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation.,” arXiv preprint arXiv:2010.11631 (2020).  
+
+## Other Links
+
+- This code borrows heavily from [ISMIR2020_U_Nets_SVS](https://github.com/ws-choi/ISMIR2020_U_Nets_SVS/) repository. Many thanks.
+
+- The original Conditional U-Net 
+    - [tensorflow version](https://github.com/gabolsgabs/cunet) (official)
+    - [pytorch version](https://github.com/ws-choi/Conditioned-U-Net-pytorch)

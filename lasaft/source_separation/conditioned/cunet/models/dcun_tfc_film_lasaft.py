@@ -96,14 +96,14 @@ class DCUN_TFC_FiLM_LaSAFT(DenseCUNet_FiLM):
             x = self.encoders[i].tfc(x)
             if self.is_encoder_conditioned:
                 x = self.film(x, gammas_encoder[i], betas_encoder[i])
-            x = x + self.encoders[i].tdf(x)
+            x = x + self.encoders[i].lasaft(x,condition_embedding)
             encoding_outputs.append(x)
             x = self.downsamplings[i](x)
 
         x = self.mid_block.tfc(x)
         if self.is_middle_conditioned:
             x = self.film(x, gammas_middle, betas_middle)
-        x = x + self.mid_block.tdf(x)
+        x = x + self.mid_block.lasaft(x,condition_embedding)
 
         for i in range(self.n):
             x = self.upsamplings[i](x)
@@ -111,7 +111,7 @@ class DCUN_TFC_FiLM_LaSAFT(DenseCUNet_FiLM):
             x = self.decoders[i].tfc(x)
             if self.is_decoder_conditioned:
                 x = self.film(x, gammas_decoder[i], betas_decoder[i])
-            x = x + self.decoders[i].tdf(x)
+            x = x + self.decoders[i].lasaft(x,condition_embedding)
 
         return self.last_conv(x)
 
@@ -148,8 +148,15 @@ class DCUN_TFC_FiLM_LaSAFT_Framework(DenseCUNet_FiLM_Framework):
     def add_model_specific_args(parent_parser):
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
 
-        parser.add_argument('--gamma_activation', type=str, default='identity')
-        parser.add_argument('--beta_activation', type=str, default='identity')
+        parser.add_argument('--n_internal_layers', type=int, default=5)
+
+        parser.add_argument('--kernel_size_t', type=int, default=3)
+        parser.add_argument('--kernel_size_f', type=int, default=3)
+
+        parser.add_argument('--bn_factor', type=int, default=16)
+        parser.add_argument('--min_bn_units', type=int, default=16)
+        parser.add_argument('--tfc_tdf_bias', type=bool, default=False)
+        parser.add_argument('--tfc_tdf_activation', type=str, default='relu')
 
         parser.add_argument('--num_tdfs', type=int, default=6)
         parser.add_argument('--dk', type=int, default=32)
