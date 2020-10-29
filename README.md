@@ -39,7 +39,9 @@ pip install musdb museval pytorch_lightning effortless_config wandb pydub nltk s
 conda activate yourcondaname
 ```
 
-### 2. Training a default CUNet
+### 2. Training a proposed architecture
+
+link: [Proposed architecture](https://github.com/ws-choi/Conditioned-Source-Separation-LaSAFT/blob/main/lasaft/source_separation/conditioned/cunet/models/dcun_tfc_gpocm_lasaft.py) (CUNET TFC + GPoCM + LaSAFT)
 
 ```shell script
 python main.py 
@@ -202,7 +204,7 @@ Please see this [document](https://github.com/ws-choi/ISMIR2020_U_Nets_SVS/blob/
 
 
         
-#### 1.4. Block-dependent Parameters
+#### 1.4. Block-dependent Parameters (TBA)
 
 ##### 1.4.A. TDF Net
 
