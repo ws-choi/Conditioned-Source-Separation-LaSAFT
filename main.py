@@ -52,7 +52,7 @@ if __name__ == '__main__':
         trainer.train(parser.parse_args())
 
     elif mode == 'eval':
-        parser.add_argument('--ckpt', type=str)
+        parser.add_argument('--epoch', type=str)
         parser = Trainer.add_argparse_args(parser)
         args = parser.parse_args()
         vargs = vars(args)
