@@ -29,7 +29,7 @@ pip install musdb museval pytorch_lightning effortless_config wandb pydub nltk s
 
 ## Demonstration: A Pretrained Model
 
-> TBA
+Interactive Demonstration - [Colab Link](https://colab.research.google.com/github/ws-choi/Conditioned-Source-Separation-LaSAFT/blob/main/colab_demo/LaSAFT_with_GPoCM.ipynb)
 
 ## Tutorial
 
