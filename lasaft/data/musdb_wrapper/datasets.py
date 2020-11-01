@@ -467,12 +467,11 @@ class SingleTrackSet(Dataset):
         self.cache[0]['linear_mixture'] = track.astype(np.float32)
 
     def __len__(self):
-        return self.acc_chunk_final_ids[-1] * len(self.target_names)
+        return self.acc_chunk_final_ids[-1] #* len(self.target_names)
 
     def __getitem__(self, idx):
 
-        target_offset = idx % len(self.target_names)
-        idx = idx // len(self.target_names)
+        target_offset = 0 #idx % len(self.target_names)
 
         target_name = self.target_names[target_offset]
         mixture_idx, start_pos = self.idx_to_track_offset(idx)
