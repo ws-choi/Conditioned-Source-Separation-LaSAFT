@@ -252,7 +252,7 @@ class Dense_CUNet_Framework(Spectrogram_based):
         import numpy as np
 
         with torch.no_grad():
-            db = SingleTrackSet(input_signal, self.hop_length, self.num_frame, self.target_name )
+            db = SingleTrackSet(input_signal, self.hop_length, self.num_frame)
             assert target in db.source_names
             separated = []
 

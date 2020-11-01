@@ -439,7 +439,7 @@ class MusdbUnmixedEvalSet(Dataset):
 
 class SingleTrackSet(Dataset):
 
-    def __init__(self, track, hop_length, num_frame, target_name):
+    def __init__(self, track, hop_length, num_frame):
 
         assert len(track.shape) == 2
         assert track.shape[1] == 2  # check stereo audio
@@ -453,7 +453,7 @@ class SingleTrackSet(Dataset):
         self.lengths = [track.shape[0]]
         self.source_names = ['vocals', 'drums', 'bass', 'other']  # == self.musdb_train.targets_names[:-2]
 
-        self.target_names = [target_name]
+        self.target_names = self.source_names
 
         self.num_tracks = 1
 
