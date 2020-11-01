@@ -28,6 +28,7 @@ pip install musdb museval pytorch_lightning effortless_config wandb pydub nltk s
    ```
 
 ## Demonstration: A Pretrained Model
+[![demo](https://i.imgur.com/8hPZJIY.png)](https://www.youtube.com/watch?v=2GEpxjCo1tI)
 
 Interactive Demonstration - [Colab Link](https://colab.research.google.com/github/ws-choi/Conditioned-Source-Separation-LaSAFT/blob/main/colab_demo/LaSAFT_with_GPoCM.ipynb)
 
