@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
+from lasaft.data.musdb_wrapper.datasets import SingleTrackSet
 from lasaft.source_separation.conditioned.separation_framework import Spectrogram_based
 from lasaft.utils.functions import get_activation_by_name, string_to_list
 
@@ -245,6 +246,28 @@ class Dense_CUNet_Framework(Spectrogram_based):
             restored = self.stft.restore_complex(output_spec)
 
         return restored, output_spec_cache
+
+    def separate_track(self, input_signal, target) -> torch.Tensor:
+
+        import numpy as np
+
+        with torch.no_grad():
+            db = SingleTrackSet(input_signal, self.hop_length, self.num_frame, self.target_name )
+            assert target in db.source_names
+            separated = []
+
+            input_condition = np.array(db.source_names.index(target), dtype=np.long)
+            input_condition = torch.from_numpy(input_condition).unsqueeze(0).to(self.device)
+
+            for item in db:
+                separated.append(self.separate(item.unsqueeze(0).to(self.device), input_condition)[0]
+                                 [self.trim_length:-self.trim_length].detach().cpu().numpy())
+
+        separated = np.concatenate(separated, axis=0)
+
+        import soundfile
+        soundfile.write('temp.wav', separated, 44100)
+        return soundfile.read('temp.wav')[0]
 
     @staticmethod
     def add_model_specific_args(parent_parser):

@@ -5,7 +5,6 @@ import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-
 import random
 
 from lasaft.utils.fourier import get_trim_length
@@ -435,4 +434,82 @@ class MusdbUnmixedEvalSet(Dataset):
             track = self.cache[idx][target_name]
         else:
             track = self.musdb_test[idx].targets[target_name].audio.astype(np.float32)
+        return track[pos:pos + length] if length is not None else track[pos:]
+
+
+class SingleTrackSet(Dataset):
+
+    def __init__(self, track, hop_length, num_frame, target_name):
+
+        assert len(track.shape) == 2
+        assert track.shape[1] == 2  # check stereo audio
+
+        self.hop_length = hop_length
+        self.window_length = hop_length * (num_frame - 1)
+        self.trim_length = get_trim_length(self.hop_length)
+
+        self.true_samples = self.window_length - 2 * self.trim_length
+
+        self.lengths = [track.shape[0]]
+        self.source_names = ['vocals', 'drums', 'bass', 'other']  # == self.musdb_train.targets_names[:-2]
+
+        self.target_names = [target_name]
+
+        self.num_tracks = 1
+
+        import math
+        num_chunks = [math.ceil(length / self.true_samples) for length in self.lengths]
+        self.acc_chunk_final_ids = [sum(num_chunks[:i + 1]) for i in range(self.num_tracks)]
+
+        self.cache_mode = True
+        self.cache = {}
+        self.cache[0] = {}
+        self.cache[0]['linear_mixture'] = track.astype(np.float32)
+
+    def __len__(self):
+        return self.acc_chunk_final_ids[-1] * len(self.target_names)
+
+    def __getitem__(self, idx):
+
+        target_offset = idx % len(self.target_names)
+        idx = idx // len(self.target_names)
+
+        target_name = self.target_names[target_offset]
+        mixture_idx, start_pos = self.idx_to_track_offset(idx)
+
+        length = self.true_samples
+        left_padding_num = right_padding_num = self.trim_length
+        if mixture_idx is None:
+            raise StopIteration
+        mixture_length = self.lengths[mixture_idx]
+        if start_pos + length > mixture_length:  # last
+            right_padding_num += self.true_samples - (mixture_length - start_pos)
+            length = None
+
+        mixture = self.get_audio(mixture_idx, 'linear_mixture', start_pos, length)
+
+        mixture = np.concatenate((np.zeros((left_padding_num, 2), dtype=np.float32), mixture,
+                                  np.zeros((right_padding_num, 2), dtype=np.float32)), 0)
+
+        mixture = torch.from_numpy(mixture)
+
+        return mixture
+
+    def idx_to_track_offset(self, idx):
+
+        for i, last_chunk in enumerate(self.acc_chunk_final_ids):
+            if idx < last_chunk:
+                if i != 0:
+                    offset = (idx - self.acc_chunk_final_ids[i - 1]) * self.true_samples
+                else:
+                    offset = idx * self.true_samples
+                return i, offset
+
+        return None, None
+
+    def get_audio(self, idx, target_name, pos=0, length=None):
+        if self.cache_mode:
+            track = self.cache[idx][target_name]
+        else:
+            track = self.musdb_valid[idx].targets[target_name].audio.astype(np.float32)
         return track[pos:pos + length] if length is not None else track[pos:]
