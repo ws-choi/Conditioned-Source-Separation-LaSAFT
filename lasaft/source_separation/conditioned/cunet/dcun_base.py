@@ -251,17 +251,18 @@ class Dense_CUNet_Framework(Spectrogram_based):
 
         import numpy as np
 
+        self.eval()
         with torch.no_grad():
-            db = SingleTrackSet(input_signal, self.hop_length, self.num_frame)
-            assert target in db.source_names
-            separated = []
+                db = SingleTrackSet(input_signal, self.hop_length, self.num_frame)
+                assert target in db.source_names
+                separated = []
 
-            input_condition = np.array(db.source_names.index(target), dtype=np.long)
-            input_condition = torch.from_numpy(input_condition).unsqueeze(0).to(self.device)
+                input_condition = np.array(db.source_names.index(target))
+                input_condition = torch.tensor(input_condition, dtype=torch.long, device=self.device).view(1)
 
-            for item in db:
-                separated.append(self.separate(item.unsqueeze(0).to(self.device), input_condition)[0]
-                                 [self.trim_length:-self.trim_length].detach().cpu().numpy())
+                for item in db:
+                    separated.append(self.separate(item.unsqueeze(0).to(self.device), input_condition)[0]
+                                     [self.trim_length:-self.trim_length].detach().cpu().numpy())
 
         separated = np.concatenate(separated, axis=0)
 
