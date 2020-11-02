@@ -22,6 +22,10 @@ def train(param):
     if args['spec_type'] != 'magnitude':
         args['input_channels'] = 4
 
+    if args['resume_from_checkpoint'] is None:
+        if args['seed'] is not None:
+            seed_everything(args['seed'])
+
     model = framework(**args)
 
     if args['last_activation'] != 'identity' and args['spec_est_mode'] != 'masking':
@@ -111,10 +115,6 @@ def train(param):
         return 0
 
     print(model)
-
-    if args['resume_from_checkpoint'] is None:
-        if args['seed'] is not None:
-            seed_everything(args['seed'])
 
     trainer.fit(model, train_data_loader, valid_data_loader)
 
