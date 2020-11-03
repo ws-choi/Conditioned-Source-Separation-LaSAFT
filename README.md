@@ -2,6 +2,8 @@
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/lasaft-latent-source-attentive-frequency/music-source-separation-on-musdb18)](https://paperswithcode.com/sota/music-source-separation-on-musdb18?p=lasaft-latent-source-attentive-frequency)
 
+Check separated samples on this [demo page](https://lasaft.github.io/)!
+
 ## Caution! 
 > This page is under construction. It might contain wrong information.
 
