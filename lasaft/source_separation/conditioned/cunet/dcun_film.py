@@ -91,14 +91,14 @@ class DenseCUNet_FiLM_Framework(Dense_CUNet_Framework):
     def __init__(self, n_fft, hop_length, num_frame,
                  spec_type, spec_est_mode,
                  conditional_spec2spec,
-                 optimizer, lr, dev_mode, train_loss, val_loss
+                 optimizer, lr, train_loss, val_loss
                  ):
 
         super(DenseCUNet_FiLM_Framework, self).__init__(
             n_fft, hop_length, num_frame,
             spec_type, spec_est_mode,
             conditional_spec2spec,
-            optimizer, lr, dev_mode, train_loss, val_loss
+            optimizer, lr, train_loss, val_loss
         )
 
     def to_spec(self, input_signal) -> torch.Tensor:

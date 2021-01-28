@@ -3,7 +3,7 @@ from warnings import warn
 
 from pytorch_lightning.loggers import WandbLogger
 
-from lasaft.data.musdb_wrapper.dataloaders import DataProvider
+from lasaft.data.data_provider import DataProvider
 from lasaft.source_separation.model_definition import get_class_by_name
 from lasaft.utils.functions import mkdir_if_not_exists
 from pathlib import Path

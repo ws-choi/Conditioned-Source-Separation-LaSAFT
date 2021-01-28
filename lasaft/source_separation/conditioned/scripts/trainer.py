@@ -7,7 +7,8 @@ from pytorch_lightning.loggers import WandbLogger
 from pathlib import Path
 from pytorch_lightning import Trainer, seed_everything
 
-from lasaft.data.musdb_wrapper import DataProvider
+from lasaft.data import data_provider
+from lasaft.data.data_provider import DataProvider
 from lasaft.source_separation.model_definition import get_class_by_name
 from lasaft.utils.functions import mkdir_if_not_exists
 
@@ -91,31 +92,37 @@ def train(param):
     valid_kwargs = inspect.signature(Trainer.__init__).parameters
     trainer_kwargs = dict((name, args[name]) for name in valid_kwargs if name in args)
 
-    # DATASET
-    ##########################################################
-    data_provider = DataProvider(**args)
-    ##########################################################
-    # Trainer Definition
 
     # Trainer
     trainer = Trainer(**trainer_kwargs)
-    n_fft, hop_length, num_frame = args['n_fft'], args['hop_length'], args['num_frame']
-    train_data_loader = data_provider.get_train_dataloader(n_fft, hop_length, num_frame)
-    valid_data_loader = data_provider.get_valid_dataloader(n_fft, hop_length, num_frame)
+    dataset_args = {'musdb_root': args['musdb_root'],
+                    'batch_size': args['batch_size'],
+                    'num_workers': args['num_workers'],
+                    'pin_memory': args['pin_memory'],
+                    'num_frame': args['num_frame'],
+                    'hop_length': args['hop_length'],
+                    'n_fft': args['n_fft']}
+
+    dp = DataProvider(**dataset_args)
+    train_dataset, training_dataloader = dp.get_training_dataset_and_loader()
+    valid_dataset, validation_dataloader = dp.get_validation_dataset_and_loader()
 
     for key in sorted(args.keys()):
         print('{}:{}'.format(key, args[key]))
 
     if args['auto_lr_find']:
-        lr_finder = trainer.lr_find(model, train_data_loader, valid_data_loader, early_stop_threshold=None)
-        print(lr_finder.results)
-        # torch.save(lr_finder.results, 'lr_result.cache')
-        new_lr = lr_finder.suggestion()
-        print('new_lr_suggestion:', new_lr)
-        return 0
+        lr_find = trainer.tuner.lr_find(model,
+                                        training_dataloader,
+                                        validation_dataloader,
+                                        early_stop_threshold=None,
+                                        min_lr=1e-5)
 
-    print(model)
+        print(f"Found lr: {lr_find.suggestion()}")
+        return None
 
-    trainer.fit(model, train_data_loader, valid_data_loader)
+    if args['resume_from_checkpoint'] is not None:
+        print('resume from the checkpoint')
+
+    trainer.fit(model, training_dataloader, validation_dataloader)
 
     return None

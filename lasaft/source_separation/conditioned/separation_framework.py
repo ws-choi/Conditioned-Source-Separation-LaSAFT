@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from argparse import ArgumentParser
-from typing import List, Union
+from typing import List, Union, Any
 
 import numpy as np
 import pydub
@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 import soundfile
 import torch
 import wandb
-from pytorch_lightning import EvalResult
+
 from pytorch_lightning.loggers import WandbLogger
 
 from lasaft.source_separation.conditioned import loss_functions
@@ -29,7 +29,7 @@ class Conditional_Source_Separation(pl.LightningModule, metaclass=ABCMeta):
 
         return loss_functions.add_model_specific_args(parser)
 
-    def __init__(self, n_fft, hop_length, num_frame, optimizer, lr, dev_mode):
+    def __init__(self, n_fft, hop_length, num_frame, optimizer, lr):
         super(Conditional_Source_Separation, self).__init__()
 
         self.n_fft = n_fft
@@ -42,7 +42,6 @@ class Conditional_Source_Separation(pl.LightningModule, metaclass=ABCMeta):
         self.optimizer = optimizer
 
         self.target_names = ['vocals', 'drums', 'bass', 'other']
-        self.dev_mode = dev_mode
 
     def configure_optimizers(self):
         optimizer = get_optimizer_by_name(self.optimizer)
@@ -86,9 +85,8 @@ class Conditional_Source_Separation(pl.LightningModule, metaclass=ABCMeta):
 
         import museval
         results = museval.EvalStore(frames_agg='median', tracks_agg='median')
-        idx_list = [1] if self.dev_mode else range(self.musdb_test.num_tracks)
 
-        for idx in idx_list:
+        for idx in [1]:
             estimation = {}
             for target_name in self.target_names:
                 estimation[target_name] = get_estimation(idx, target_name, self.test_estimation_dict)
@@ -182,11 +180,11 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
     def __init__(self, n_fft, hop_length, num_frame,
                  spec_type, spec_est_mode,
                  conditional_spec2spec,
-                 optimizer, lr, dev_mode,
+                 optimizer, lr,
                  train_loss, val_loss
                  ):
         super(Spectrogram_based, self).__init__(n_fft, hop_length, num_frame,
-                                                optimizer, lr, dev_mode)
+                                                optimizer, lr)
 
         self.n_fft = n_fft
         self.hop_length = hop_length
@@ -213,10 +211,10 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
     def training_step(self, batch, batch_idx):
         mixture_signal, target_signal, condition = batch
         loss = self.train_loss(self, mixture_signal, condition, target_signal)
-        result = pl.TrainResult(loss)
-        result.log('train_loss', loss, prog_bar=False, logger=True, on_step=False, on_epoch=True,
-                   reduce_fx=torch.mean)
-        return result
+        self.log('train_loss', loss, prog_bar=False, logger=True, on_step=False, on_epoch=True,
+                 reduce_fx=torch.mean)
+
+        return loss
 
     # Validation Process
     def on_validation_epoch_start(self):
@@ -227,11 +225,10 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
 
     def validation_step(self, batch, batch_idx):
 
-        mixtures, mixture_ids, window_offsets, input_conditions, target_names, targets = batch
+        mixtures, targets, mixture_ids, window_offsets, input_conditions, target_names = batch
 
         loss = self.val_loss(self, mixtures, input_conditions, targets)
-        result = pl.EvalResult()
-        result.log('raw_val_loss', loss, prog_bar=False, logger=False, reduce_fx=torch.mean)
+        self.log('raw_val_loss', loss, prog_bar=False, logger=False, reduce_fx=torch.mean)
 
         # Result Cache
         if 0 in mixture_ids.view(-1):
@@ -245,9 +242,9 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
                     self.valid_estimation_dict[target_name][mixture_idx.item()][
                         window_offset.item()] = estimated_target.detach().cpu().numpy()
 
-        return result
+        return loss
 
-    def validation_epoch_end(self, outputs: Union[EvalResult, List[EvalResult]]) -> EvalResult:
+    def validation_epoch_end(self, outputs: List[Any]) -> None:
 
         for idx in [0]:
             estimation = {}
@@ -258,16 +255,17 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
                 if estimation[target_name] is not None:
                     estimation[target_name] = estimation[target_name].astype(np.float32)
 
-                    if self.current_epoch > 10 and isinstance(self.logger, WandbLogger):
-                        self.logger.experiment.log({'result_sample_{}_{}'.format(self.current_epoch, target_name): [
-                            wandb.Audio(estimation[target_name][44100 * 20:44100 * 40],
-                                        caption='{}_{}'.format(idx, target_name),
-                                        sample_rate=44100)]})
+                    if self.current_epoch > 1 and isinstance(self.logger, WandbLogger):
+                        track = estimation[target_name]
+                        if track.shape[0] > 40 * 44100:
+                            track = track[44100 * 20:44100 * 40]
 
-        reduced_loss = sum(outputs['raw_val_loss'] / len(outputs['raw_val_loss']))
-        result = pl.EvalResult(early_stop_on=reduced_loss, checkpoint_on=reduced_loss)
-        result.log('val_loss', reduced_loss, prog_bar=False, logger=True, on_step=False, on_epoch=True, sync_dist=True)
-        return result
+                        self.logger.experiment.log({'result_sample_{}_{}'.format(self.current_epoch, target_name): [
+                            wandb.Audio(track, caption='{}_{}'.format(idx, target_name), sample_rate=44100)]})
+
+        reduced_loss = torch.stack(outputs).mean()
+        self.log('val_loss', reduced_loss, prog_bar=False, logger=True, on_step=False, on_epoch=True, sync_dist=True)
+        print(reduced_loss)
 
     @abstractmethod
     def to_spec(self, input_signal) -> torch.Tensor:

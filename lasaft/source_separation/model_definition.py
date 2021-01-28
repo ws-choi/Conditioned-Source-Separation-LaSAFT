@@ -22,7 +22,8 @@ def get_class_by_name(problem_name, model_name):
             return DCUN_TFC_GPoCM_TDF_Framework
         elif model_name == 'CUNET_TFC_GPoCM_LaSAFT':
             return DCUN_TFC_GPoCM_LaSAFT_Framework
-
+        elif model_name == 'lasaft_net':
+            return DCUN_TFC_GPoCM_LaSAFT_Framework
         else:
             raise NotImplementedError
 

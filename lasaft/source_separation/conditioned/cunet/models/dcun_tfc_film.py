@@ -77,7 +77,7 @@ class DCUN_TFC_FiLM_Framework(DenseCUNet_FiLM_Framework):
 
     def __init__(self, n_fft, hop_length, num_frame,
                  spec_type, spec_est_mode,
-                 optimizer, lr, dev_mode,
+                 optimizer, lr,
                  train_loss, val_loss,
                  **kwargs):
         valid_kwargs = inspect.signature(DCUN_TFC_FiLM.__init__).parameters
@@ -92,7 +92,7 @@ class DCUN_TFC_FiLM_Framework(DenseCUNet_FiLM_Framework):
         super(DCUN_TFC_FiLM_Framework, self).__init__(n_fft, hop_length, num_frame,
                                                       spec_type, spec_est_mode,
                                                       conditional_spec2spec,
-                                                      optimizer, lr, dev_mode,
+                                                      optimizer, lr,
                                                       train_loss_, val_loss_
                                                       )
 

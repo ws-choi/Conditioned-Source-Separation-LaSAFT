@@ -6,7 +6,6 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from lasaft.data.musdb_wrapper.datasets import SingleTrackSet
 from lasaft.source_separation.conditioned.separation_framework import Spectrogram_based
 from lasaft.utils.functions import get_activation_by_name, string_to_list
 
@@ -159,14 +158,14 @@ class Dense_CUNet_Framework(Spectrogram_based):
     def __init__(self, n_fft, hop_length, num_frame,
                  spec_type, spec_est_mode,
                  conditional_spec2spec,
-                 optimizer, lr, dev_mode, train_loss, val_loss
+                 optimizer, lr, train_loss, val_loss
                  ):
 
         super(Dense_CUNet_Framework, self).__init__(
             n_fft, hop_length, num_frame,
             spec_type, spec_est_mode,
             conditional_spec2spec,
-            optimizer, lr, dev_mode, train_loss, val_loss
+            optimizer, lr, train_loss, val_loss
         )
 
     def to_spec(self, input_signal) -> torch.Tensor:
