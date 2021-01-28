@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
+from lasaft.data.musdb_wrapper import SingleTrackSet
 from lasaft.source_separation.conditioned.separation_framework import Spectrogram_based
 from lasaft.utils.functions import get_activation_by_name, string_to_list
 
@@ -157,14 +158,14 @@ class Dense_CUNet_Framework(Spectrogram_based):
 
     def __init__(self, n_fft, hop_length, num_frame,
                  spec_type, spec_est_mode,
-                 conditional_spec2spec,
+                 spec2spec,
                  optimizer, lr, train_loss, val_loss
                  ):
 
         super(Dense_CUNet_Framework, self).__init__(
             n_fft, hop_length, num_frame,
             spec_type, spec_est_mode,
-            conditional_spec2spec,
+            spec2spec,
             optimizer, lr, train_loss, val_loss
         )
 
@@ -178,7 +179,7 @@ class Dense_CUNet_Framework(Spectrogram_based):
 
     def forward(self, input_signal, input_condition) -> torch.Tensor:
         input_spec = self.to_spec(input_signal)
-        output_spec = self.conditional_spec2spec(input_spec, input_condition)
+        output_spec = self.spec2spec(input_spec, input_condition)
 
         if self.masking_based:
             output_spec = input_spec * output_spec
@@ -197,7 +198,7 @@ class Dense_CUNet_Framework(Spectrogram_based):
             spec_complex = torch.flatten(spec_complex, start_dim=-2)  # *, N, T, 2ch
             input_spec = spec_complex.transpose(-1, -3)  # *, 2ch, T, N
 
-        output_spec = self.conditional_spec2spec(input_spec, input_condition)
+        output_spec = self.spec2spec(input_spec, input_condition)
 
         if self.masking_based:
             output_spec = input_spec * output_spec
@@ -227,7 +228,7 @@ class Dense_CUNet_Framework(Spectrogram_based):
             spec_complex = torch.flatten(spec_complex, start_dim=-2)  # *, N, T, 2ch
             input_spec = spec_complex.transpose(-1, -3)  # *, 2ch, T, N
 
-        output_spec = self.conditional_spec2spec(input_spec, input_condition)
+        output_spec = self.spec2spec(input_spec, input_condition)
 
         if self.masking_based:
             output_spec = input_spec * output_spec
@@ -274,7 +275,7 @@ class Dense_CUNet_Framework(Spectrogram_based):
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
 
         parser.add_argument('--n_blocks', type=int, default=7)
-        parser.add_argument('--input_channels', type=int, default=2)
+        parser.add_argument('--input_channels', type=int, default=4)
         parser.add_argument('--internal_channels', type=int, default=24)
         parser.add_argument('--first_conv_activation', type=str, default='relu')
         parser.add_argument('--last_activation', type=str, default='sigmoid')

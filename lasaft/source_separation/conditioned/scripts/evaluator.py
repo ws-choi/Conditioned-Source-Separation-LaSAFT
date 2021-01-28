@@ -17,6 +17,13 @@ def eval(param):
     else:
         args = param
 
+    for key in args.keys():
+        if args[key] == 'None':
+            args[key] = None
+
+    if args['gpu_index'] is not None:
+        args['gpus'] = str(args['gpu_index'])
+
     # MODEL
     ##########################################################
     # # # get framework
@@ -68,6 +75,7 @@ def eval(param):
     data_provider = DataProvider(**args)
     ##########################################################
 
+    trainer_kwargs['precision'] = 32
     trainer = Trainer(**trainer_kwargs)
     n_fft, hop_length, num_frame = args['n_fft'], args['hop_length'], args['num_frame']
     test_data_loader = data_provider.get_test_dataloader(n_fft, hop_length, num_frame)

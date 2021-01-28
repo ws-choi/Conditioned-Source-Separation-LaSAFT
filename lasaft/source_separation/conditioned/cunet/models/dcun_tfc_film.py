@@ -84,14 +84,14 @@ class DCUN_TFC_FiLM_Framework(DenseCUNet_FiLM_Framework):
         tfc_tdf_net_kwargs = dict((name, kwargs[name]) for name in valid_kwargs if name in kwargs)
         tfc_tdf_net_kwargs['n_fft'] = n_fft
 
-        conditional_spec2spec = DCUN_TFC_FiLM(**tfc_tdf_net_kwargs)
+        spec2spec = DCUN_TFC_FiLM(**tfc_tdf_net_kwargs)
 
         train_loss_ = get_conditional_loss(train_loss, n_fft, hop_length, **kwargs)
         val_loss_ = get_conditional_loss(val_loss, n_fft, hop_length, **kwargs)
 
         super(DCUN_TFC_FiLM_Framework, self).__init__(n_fft, hop_length, num_frame,
                                                       spec_type, spec_est_mode,
-                                                      conditional_spec2spec,
+                                                      spec2spec,
                                                       optimizer, lr,
                                                       train_loss_, val_loss_
                                                       )

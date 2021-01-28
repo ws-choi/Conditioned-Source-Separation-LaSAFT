@@ -90,14 +90,14 @@ class DenseCUNet_FiLM_Framework(Dense_CUNet_Framework):
 
     def __init__(self, n_fft, hop_length, num_frame,
                  spec_type, spec_est_mode,
-                 conditional_spec2spec,
+                 spec2spec,
                  optimizer, lr, train_loss, val_loss
                  ):
 
         super(DenseCUNet_FiLM_Framework, self).__init__(
             n_fft, hop_length, num_frame,
             spec_type, spec_est_mode,
-            conditional_spec2spec,
+            spec2spec,
             optimizer, lr, train_loss, val_loss
         )
 
@@ -111,7 +111,7 @@ class DenseCUNet_FiLM_Framework(Dense_CUNet_Framework):
 
     def forward(self, input_signal, input_condition) -> torch.Tensor:
         input_spec = self.to_spec(input_signal)
-        output_spec = self.conditional_spec2spec(input_spec, input_condition)
+        output_spec = self.spec2spec(input_spec, input_condition)
 
         if self.masking_based:
             output_spec = input_spec * output_spec
@@ -130,7 +130,7 @@ class DenseCUNet_FiLM_Framework(Dense_CUNet_Framework):
             spec_complex = torch.flatten(spec_complex, start_dim=-2)  # *, N, T, 2ch
             input_spec = spec_complex.transpose(-1, -3)  # *, 2ch, T, N
 
-        output_spec = self.conditional_spec2spec(input_spec, input_condition)
+        output_spec = self.spec2spec(input_spec, input_condition)
 
         if self.masking_based:
             output_spec = input_spec * output_spec
@@ -160,7 +160,7 @@ class DenseCUNet_FiLM_Framework(Dense_CUNet_Framework):
             spec_complex = torch.flatten(spec_complex, start_dim=-2)  # *, N, T, 2ch
             input_spec = spec_complex.transpose(-1, -3)  # *, 2ch, T, N
 
-        output_spec = self.conditional_spec2spec(input_spec, input_condition)
+        output_spec = self.spec2spec(input_spec, input_condition)
 
         if self.masking_based:
             output_spec = input_spec * output_spec

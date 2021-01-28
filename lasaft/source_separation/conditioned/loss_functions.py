@@ -67,6 +67,13 @@ def get_conditional_loss(loss_name, window_length, hop_length, **kwargs):
         raise ModuleNotFoundError
 
 
+def KL_loss(mu, logvar):
+    # -0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+    KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
+    KLD = torch.mean(KLD_element).mul_(-0.5)
+    return KLD
+
+
 class Conditional_Loss(ABC):
 
     def __init__(self, **kwargs):
@@ -89,8 +96,13 @@ class Conditional_Spectrogram_Loss(Conditional_Loss):
 
     def compute(self, model, mixture_signal, condition, target_signal):
         target = model.to_spec(target_signal)
-        target_hat = model.forward(mixture_signal, condition)
+        target_hat = model(mixture_signal, condition)
         return self.criterion(target_hat, target)
+
+    def compute_with_ca(self, model, mixture_signal, condition, target_signal, disable_ca):
+        target = model.to_spec(target_signal)
+        target_hat, mu, log_var = model.forward(mixture_signal, condition, disable_ca)
+        return self.criterion(target_hat, target), mu, log_var
 
 
 class Conditional_RAW_Loss(Conditional_Loss):

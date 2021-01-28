@@ -7,7 +7,6 @@ from pytorch_lightning.loggers import WandbLogger
 from pathlib import Path
 from pytorch_lightning import Trainer, seed_everything
 
-from lasaft.data import data_provider
 from lasaft.data.data_provider import DataProvider
 from lasaft.source_separation.model_definition import get_class_by_name
 from lasaft.utils.functions import mkdir_if_not_exists
@@ -74,12 +73,14 @@ def train(param):
         )
         args['resume_from_checkpoint'] = str(args['resume_from_checkpoint'])
 
+    model_name = model.spec2spec.__class__.__name__
+
     # -- logger setting
     log = args['log']
     if log == 'False':
         args['logger'] = False
     elif log == 'wandb':
-        args['logger'] = WandbLogger(project='lasaft', tags=args['model'], offline=False, id=run_id)
+        args['logger'] = WandbLogger(project='lasaft_exp', tags=[model_name], offline=False, name=run_id)
         args['logger'].log_hyperparams(model.hparams)
         args['logger'].watch(model, log='all')
     elif log == 'tensorboard':

@@ -41,6 +41,63 @@ class TFC(nn.Module):
         return x_
 
 
+class DTFC(nn.Module):
+    """ [B, in_channels, T, F] => [B, gr, T, F] """
+
+    def __init__(self, in_channels, out_channels, num_layers, gr, kt, kf, activation):
+        """
+        in_channels: number of input channels
+        num_layers: number of densely connected conv layers
+        gr: growth rate
+        kt: kernel size of the temporal axis.
+        kf: kernel size of the freq. axis
+        activation: activation function
+        """
+        super(DTFC, self).__init__()
+
+        assert num_layers > 2
+        self.first_conv = nn.Sequential(
+            nn.Conv2d(in_channels=in_channels, out_channels=gr, kernel_size=(kf, kt), stride=1,
+                      padding=(kt // 2, kf // 2)),
+            nn.BatchNorm2d(gr),
+            activation(),
+        )
+
+        c = gr
+        d = 1
+        self.H = nn.ModuleList()
+        for i in range(num_layers - 2):
+            self.H.append(
+                nn.Sequential(
+                    nn.Conv2d(in_channels=c, out_channels=gr, kernel_size=(kf, kt), stride=1,
+                              padding=((kt // 2) * d, (kf // 2) * d), dilation=d),
+                    nn.BatchNorm2d(gr),
+                    activation(),
+                )
+            )
+            c += gr
+            d += 2
+
+        self.last_conv = nn.Sequential(
+            nn.Conv2d(in_channels=c, out_channels=out_channels, kernel_size=(kf, kt), stride=1,
+                      padding=(kt // 2, kf // 2)),
+            nn.BatchNorm2d(out_channels),
+            activation(),
+        )
+
+        self.activation = self.H[-1][-1]
+
+    def forward(self, x):
+        """ [B, in_channels, T, F] => [B, gr, T, F] """
+        x = self.first_conv(x)
+
+        for h in self.H:
+            x_ = h(x)
+            x = torch.cat((x_, x), 1)
+
+        return self.last_conv(x)
+
+
 class TDF(nn.Module):
     """ [B, in_channels, T, F] => [B, gr, T, F] """
 
@@ -105,9 +162,34 @@ class TFC_TDF(nn.Module):
         x = self.tfc(x)
         return x + self.tdf(x)
 
-    def init_weights(self):
-        self.tfc.init_weights()
-        self.tdf.init_weights()
+
+class DTFC_TDF(nn.Module):
+    """ [B, in_channels, T, F] => [B, gr, T, F] """
+
+    def __init__(self, in_channels, out_channels, num_layers, gr, kt, kf,
+                 f, bn_factor=16, min_bn_units=16, bias=False, activation=nn.ReLU):
+        """
+        in_channels: number of input channels
+        num_layers: number of densely connected conv layers
+        gr: growth rate
+        kt: kernel size of the temporal axis.
+        kf: kernel size of the freq. axis
+        f: num of frequency bins
+
+        below are params for TDF
+        bn_factor: bottleneck factor. if None: single layer. else: MLP that maps f => f//bn_factor => f
+        bias: bias setting of linear layers
+
+        activation: activation function
+        """
+        super(DTFC_TDF, self).__init__()
+        self.tfc = DTFC(in_channels, out_channels, num_layers, gr, kt, kf, activation)
+        self.tdf = TDF(out_channels, f, bn_factor, bias, min_bn_units, activation)
+        self.activation = self.tdf.tdf[-1]
+
+    def forward(self, x):
+        x = self.tfc(x)
+        return x + self.tdf(x)
 
 
 class TDF_f1_to_f2(nn.Module):
@@ -126,6 +208,8 @@ class TDF_f1_to_f2(nn.Module):
 
         super(TDF_f1_to_f2, self).__init__()
 
+        self.num_target_f = f2
+
         if bn_factor is None:
             self.tdf = nn.Sequential(
                 nn.Linear(f1, f2, bias),
@@ -134,15 +218,16 @@ class TDF_f1_to_f2(nn.Module):
             )
 
         else:
-            bn_unis = max(f2 // bn_factor, min_bn_units)
+            bn_units = max(f2 // bn_factor, min_bn_units)
             self.tdf = nn.Sequential(
-                nn.Linear(f1, bn_unis, bias),
+                nn.Linear(f1, bn_units, bias),
                 nn.BatchNorm2d(channels),
                 activation(),
-                nn.Linear(bn_unis, f2, bias),
+                nn.Linear(bn_units, f2, bias),
                 nn.BatchNorm2d(channels),
                 activation()
             )
+
 
     def forward(self, x):
         return self.tdf(x)
