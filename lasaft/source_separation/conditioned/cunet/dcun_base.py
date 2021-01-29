@@ -278,7 +278,7 @@ class Dense_CUNet_Framework(Spectrogram_based):
         parser.add_argument('--input_channels', type=int, default=4)
         parser.add_argument('--internal_channels', type=int, default=24)
         parser.add_argument('--first_conv_activation', type=str, default='relu')
-        parser.add_argument('--last_activation', type=str, default='sigmoid')
+        parser.add_argument('--last_activation', type=str, default='identity')
 
         parser.add_argument('--t_down_layers', type=tuple, default=None)
         parser.add_argument('--f_down_layers', type=tuple, default=None)
