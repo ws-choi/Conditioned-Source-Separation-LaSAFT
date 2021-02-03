@@ -1,8 +1,8 @@
 def FiLM_simple(x, gamma, beta):
     """
     :param x: an output feature map of a CNN layer [*, ch, T, F]
-    :param gamma: [*, 1]
-    :param beta: [*, 1]
+    :param gamma: [*]
+    :param beta: [*]
     :return: gamma * x + beta
     """
     gamma_ = gamma.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
