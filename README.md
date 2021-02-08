@@ -9,6 +9,8 @@ Check separated samples on this [demo page](https://lasaft.github.io/)!
 
 > We will upload our code and README after refactoring our code for better readability.
 
+> It is not available to use pretrained models currently. We will fix it soon.
+
 A Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation"
 
 ## Demonstration: A Pretrained Model
