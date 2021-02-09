@@ -227,11 +227,10 @@ def MusdbValidSetWithGT(musdb_root='etc/musdb18_samples_wav/',
 
 
 def MusdbTestSetWithGT(musdb_root='etc/musdb18_samples_wav/',
-                       target_names=None,
                        n_fft=2048,
                        hop_length=1024,
                        num_frame=64):
-    return MusdbEvalSetWithGT(musdb_root, 'test', target_names, n_fft, hop_length, num_frame)
+    return MusdbEvalSetWithGT(musdb_root, 'test', n_fft, hop_length, num_frame)
 
 
 class SingleTrackSet(Dataset):

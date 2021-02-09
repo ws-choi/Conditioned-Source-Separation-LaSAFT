@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from torch.utils.data import DataLoader
-from lasaft.data.musdb_wrapper import MusdbTrainSet, MusdbValidSetWithGT
+from lasaft.data.musdb_wrapper import MusdbTrainSet, MusdbValidSetWithGT, MusdbTestSetWithGT
 
 
 class DataProvider(object):
@@ -39,3 +39,12 @@ class DataProvider(object):
                             pin_memory=self.pin_memory)
 
         return validation_set, loader
+
+    def get_test_dataset_and_loader(self):
+        test_set = MusdbTestSetWithGT(self.musdb_root, self.n_fft, self.hop_length, self.num_frame)
+
+        loader = DataLoader(test_set, shuffle=False, batch_size=self.batch_size,
+                            num_workers=self.num_workers,
+                            pin_memory=self.pin_memory)
+
+        return test_set, loader
