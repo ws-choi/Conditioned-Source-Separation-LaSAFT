@@ -150,14 +150,14 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
 
         mixtures, targets, mixture_ids, window_offsets, input_conditions, target_names = batch
 
-        loss = self.val_loss(self, mixtures, input_conditions, targets)/self.num_val_item
+        loss = self.val_loss(self, mixtures, input_conditions, targets) / self.num_val_item
 
         self.log('raw_val_loss', loss, prog_bar=False, logger=False, reduce_fx=torch.sum)
 
         # Result Cache
         if 0 in mixture_ids.view(-1):
             estimated_targets = self.separate(mixtures, input_conditions)[:, self.trim_length:-self.trim_length]
-            #targets = targets[:, self.trim_length:-self.trim_length]
+            # targets = targets[:, self.trim_length:-self.trim_length]
 
             for mixture, mixture_idx, window_offset, input_condition, target_name, estimated_target \
                     in zip(mixtures, mixture_ids, window_offsets, input_conditions, target_names, estimated_targets):
@@ -187,7 +187,8 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
                                 wandb.Audio(track, caption='{}_{}'.format(idx, target_name), sample_rate=44100)]})
 
         reduced_loss = torch.stack(outputs).sum()
-        self.log('val_loss', reduced_loss, prog_bar=False, logger=True, on_step=False, on_epoch=True, sync_dist=True)
+        self.log('val_loss', reduced_loss, prog_bar=False, logger=True, on_step=False, on_epoch=True,
+                 reduce_fx=torch.sum, sync_dist=True, sync_dist_op='sum')
         print(reduced_loss)
 
     def on_test_epoch_start(self):
@@ -199,6 +200,7 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
             self.test_estimation_dict[target_name] = {mixture_idx: {}
                                                       for mixture_idx
                                                       in range(num_tracks)}
+
     def test_step(self, batch, batch_idx):
         mixtures, targets, mixture_ids, window_offsets, input_conditions, target_names = batch
         estimated_targets = self.separate(mixtures, input_conditions)[:, self.trim_length:-self.trim_length]
@@ -242,7 +244,6 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
             if idx == 1 and isinstance(self.logger, WandbLogger):
                 self.logger.experiment.log({'result_sample_{}_{}'.format(self.current_epoch, target_name): [
                     wandb.Audio(estimation[target_name], caption='{}_{}'.format(idx, target_name), sample_rate=44100)]})
-
 
         if isinstance(self.logger, WandbLogger):
             result_dict = results.df.groupby(
