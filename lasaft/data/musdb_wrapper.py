@@ -248,6 +248,7 @@ class SingleTrackSet(Dataset):
 
         self.lengths = [track.shape[0]]
         self.num_tracks = 1
+        self.source_names = ['vocals', 'drums', 'bass', 'other']
 
         import math
         num_chunks = [math.ceil(length / self.true_samples) for length in self.lengths]
