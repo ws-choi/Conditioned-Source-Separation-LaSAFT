@@ -54,8 +54,8 @@ class Conditional_Source_Separation(pl.LightningModule, metaclass=ABCMeta):
             return {
                 'optimizer': optimizer,
                 'lr_scheduler': ReduceLROnPlateau(optimizer,
-                                                  factor=0.5,
-                                                  patience=5,
+                                                  factor=0.1,
+                                                  patience=50,
                                                   verbose=True,
                                                   ),
                 'reduce_on_plateau': True,
