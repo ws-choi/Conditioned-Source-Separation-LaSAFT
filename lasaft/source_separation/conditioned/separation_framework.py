@@ -149,8 +149,9 @@ class Spectrogram_based(Conditional_Source_Separation, metaclass=ABCMeta):
     def validation_step(self, batch, batch_idx):
 
         mixtures, targets, mixture_ids, window_offsets, input_conditions, target_names = batch
+        batch_size = mixtures.shape[0]
 
-        loss = self.val_loss(self, mixtures, input_conditions, targets) / self.num_val_item
+        loss = self.val_loss(self, mixtures, input_conditions, targets) * batch_size / self.num_val_item
 
         self.log('raw_val_loss', loss, prog_bar=False, logger=False, reduce_fx=torch.sum)
 
