@@ -4,20 +4,14 @@
 
 Check separated samples on this [demo page](https://lasaft.github.io/)!
 
-## Caution! 
-> This page is under construction. It might contain wrong information.
-
-> We will upload our code and README after refactoring our code for better readability.
-
-> It is not available to use pretrained models currently. We will fix it soon.
-
-A Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation"
+An official Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation" (accepted to ICASSP 2021)
 
 ## Demonstration: A Pretrained Model
 
 [![demo](https://i.imgur.com/8hPZJIY.png)](https://youtu.be/buWnt89kVzs?t=8) 
 
-Interactive Demonstration - [Colab Link](https://colab.research.google.com/github/ws-choi/Conditioned-Source-Separation-LaSAFT/blob/auto_lr_schedule/colab_demo/LaSAFT_with_GPoCM_(large)_Stella_Jang_Example.ipynb)
+Interactive Demonstration - [Colab Link](https://colab.research.google.com/github/ws-choi/Conditioned-Source-Separation-LaSAFT/blob/main/colab_demo/LaSAFT_with_GPoCM_(large)_Stella_Jang_Example.ipynb)
+  - including how to download and use the pretrained model
 
 ## How to use: Step-by-Step Tutorials
 
@@ -51,8 +45,7 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
 
 - Below is an example to train a U-Net with LaSAFT+GPoCM, whose hyper-parameters are set as default.
     ```shell script
-    python main.py --problem_name conditioned_separation --mode train --run_id lasaft_net --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --bat
-    ch_size 6 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --model CUNET_TFC_GPoCM_LaSAFT
+    python main.py --problem_name conditioned_separation --mode train --run_id lasaft_net --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 6 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --model CUNET_TFC_GPoCM_LaSAFT
     ```
 - main.py includes training scripts for several models described in the paper [1].
     - It provides several options, including pytorch-lightning parameters
@@ -63,34 +56,35 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
 
     - FiLM CUNet
         ```shell script
-        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --deterministic --model CUNET_TFC_FiLM --log False
+        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --deterministic --model CUNET_TFC_FiLM --log False
         ```
     - FiLM CUNet + TDF
         ```shell script
-        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --deterministic --model CUNET_TFC_FiLM_TDF --log False
+        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --deterministic --model CUNET_TFC_FiLM_TDF --log False
         ```
     - FiLM CUNet + LaSAFT
         ```shell script
-        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --deterministic --model CUNET_TFC_FiLM_LaSAFT --log False
+        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --deterministic --model CUNET_TFC_FiLM_LaSAFT --log False
         ```
     
     - GPoCM CUNet
         ```shell script
-        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --deterministic --model CUNET_TFC_GPoCM --log False
+        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --deterministic --model CUNET_TFC_GPoCM --log False
         ```
     - GPoCM CUNet + TDF
         ```shell script
-        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --deterministic --model CUNET_TFC_GPoCM_TDF --log False
+        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --deterministic --model CUNET_TFC_GPoCM_TDF --log False
         ```
     - GPoCM CUNet + LaSAFT (* proposed model) 
         ```shell script
-        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --deterministic --model CUNET_TFC_GPoCM_LaSAFT --log False
+        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --deterministic --model CUNET_TFC_GPoCM_LaSAFT --log False
         ```
 - Table 2 in [1]
 
     - GPoCM CUNet + LaSAFT (* proposed model) 
         ```shell script
-        python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001  --check_val_every_n_epoch 10  --deterministic --model CUNET_TFC_GPoCM_LaSAFT --log False
+        python main.py --problem_name conditioned_separation --mode train --musdb_root ../repos/musdb18_wav --n_blocks 9 --num_tdfs 6 --n_fft 4096 --hop_length 1024 --precision 16 --embedding_dim 64 --pin_memory True --save_top_k 3 --patience 10 --deterministic --model CUNET_TFC_GPoCM_LaSAFT --gpus 4 --distributed_backend ddp --sync_batchnorm True --run_id lasaft_2020 --batch_size 4 --seed 2020 --log False --lr 0.0001 --auto_lr_schedule True 
+
         ```
 
    
