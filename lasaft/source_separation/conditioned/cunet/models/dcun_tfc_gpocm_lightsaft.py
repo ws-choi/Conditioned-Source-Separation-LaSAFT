@@ -114,7 +114,7 @@ class DCUN_TFC_GPoCM_LightSAFT_Framework(DenseCUNet_GPoCM_Framework):
 
     def __init__(self, n_fft, hop_length, num_frame,
                  spec_type, spec_est_mode,
-                 optimizer, lr,
+                 optimizer, lr, auto_lr_schedule,
                  train_loss, val_loss,
                  **kwargs):
         valid_kwargs = inspect.signature(DCUN_TFC_GPoCM_LightSAFT.__init__).parameters
@@ -129,7 +129,7 @@ class DCUN_TFC_GPoCM_LightSAFT_Framework(DenseCUNet_GPoCM_Framework):
         super(DCUN_TFC_GPoCM_LightSAFT_Framework, self).__init__(n_fft, hop_length, num_frame,
                                                                  spec_type, spec_est_mode,
                                                                  spec2spec,
-                                                                 optimizer, lr,
+                                                                 optimizer, lr, auto_lr_schedule,
                                                                  train_loss_, val_loss_
                                                                  )
 

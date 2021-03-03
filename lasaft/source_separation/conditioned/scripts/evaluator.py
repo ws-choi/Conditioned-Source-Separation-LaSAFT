@@ -44,13 +44,13 @@ def eval(param):
 
     # -- logger setting
     log = args['log']
-    if log == 'False' or args['dev_mode']:
+    if log == 'False':
         args['logger'] = False
         args['checkpoint_callback'] = False
         args['early_stop_callback'] = False
     elif log == 'wandb':
-        args['logger'] = WandbLogger(project='lasaft', tags=args['model'], offline=False,
-                                     id=args['run_id'] + '_eval_' + args['epoch'].replace('=','_'))
+        args['logger'] = WandbLogger(project='lasaft_exp', tags=args['model'], offline=False,
+                                     name=args['run_id'] + '_eval_' + args['epoch'].replace('=','_'))
         args['logger'].log_hyperparams(model.hparams)
         args['logger'].watch(model, log='all')
     elif log == 'tensorboard':
@@ -72,16 +72,21 @@ def eval(param):
 
     # DATASET
     ##########################################################
-    data_provider = DataProvider(**args)
+    dataset_args = {'musdb_root': args['musdb_root'],
+                    'batch_size': args['batch_size'],
+                    'num_workers': args['num_workers'],
+                    'pin_memory': args['pin_memory'],
+                    'num_frame': args['num_frame'],
+                    'hop_length': args['hop_length'],
+                    'n_fft': args['n_fft']}
+    dp = DataProvider(**dataset_args)
     ##########################################################
 
     trainer_kwargs['precision'] = 32
     trainer = Trainer(**trainer_kwargs)
-    n_fft, hop_length, num_frame = args['n_fft'], args['hop_length'], args['num_frame']
-    test_data_loader = data_provider.get_test_dataloader(n_fft, hop_length, num_frame)
-
+    _, test_data_loader = dp.get_test_dataset_and_loader()
     model = model.load_from_checkpoint(ckpt_path)
-    trainer.test(model, test_data_loader)
 
+    trainer.test(model, test_data_loader)
 
     return None

@@ -43,17 +43,17 @@ if __name__ == '__main__':
     parser.add_argument('--run_id', type=str, default=str(datetime.today().strftime("%Y%m%d_%H%M")))
     parser.add_argument('--save_weights_only', type=bool, default=False)
 
-    if mode == 'train':
+    # Env parameters
+    parser.add_argument('--batch_size', type=int, default=8)
+    parser.add_argument('--num_workers', type=int, default=0)
+    parser.add_argument('--pin_memory', type=bool, default=False)
+    parser.add_argument('--gpu_index', type=str, default=None)
 
-        # Env parameters
-        parser.add_argument('--batch_size', type=int, default=8)
-        parser.add_argument('--num_workers', type=int, default=0)
-        parser.add_argument('--pin_memory', type=bool, default=False)
+    if mode == 'train':
 
         parser.add_argument('--save_top_k', type=int, default=5)
         parser.add_argument('--patience', type=int, default=40)
         parser.add_argument('--seed', type=int, default='2020')
-        parser.add_argument('--gpu_index', type=str, default=None)
 
         parser = Trainer.add_argparse_args(parser)
         trainer.train(parser.parse_args())
