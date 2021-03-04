@@ -13,7 +13,28 @@ An official Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive
 Interactive Demonstration - [Colab Link](https://colab.research.google.com/github/ws-choi/Conditioned-Source-Separation-LaSAFT/blob/main/colab_demo/LaSAFT_with_GPoCM_(large)_Stella_Jang_Example.ipynb)
   - including how to download and use the pretrained model
 
-## How to use: Step-by-Step Tutorials
+## Quickstart: How to use Pretrained Models
+
+### 1. [Install](https://github.com/ws-choi/Conditioned-Source-Separation-LaSAFT#1-installation) LaSAFT.
+### 2. Load a Pretrained Model.
+```python
+from lasaft.pretrained import PreTrainedLaSAFTNet
+model = PreTrainedLaSAFTNet(model_name='lasaft_large_2020')
+```
+### 3. call ```model.separate_track``` !
+```python
+# audio should be an np(numpy) array of an stereo audio track
+# with dtype of float32
+# shape must be (T, 2)
+
+vocals = model.separate_track(audio, 'vocals') 
+drums = model.separate_track(audio, 'drums') 
+bass = model.separate_track(audio, 'bass') 
+other = model.separate_track(audio, 'other')
+```
+
+
+## Step-by-Step Tutorials
 
 ### 1. Installation
 
@@ -30,7 +51,7 @@ conda activate lasaft
 conda install pytorch=1.7.1 cudatoolkit=11.0 -c pytorch
 conda install -c conda-forge ffmpeg librosa=0.6
 conda install -c anaconda jupyter
-pip install musdb==0.3.1 museval==0.3.0 pytorch_lightning==1.1.6 wandb==0.10.15 pydub==0.24.1
+pip install musdb==0.3.1 museval==0.3.0 pytorch_lightning==1.1.6 wandb==0.10.15 pydub==0.24.1 wget
 ```
 
 ### 2. Dataset: Musdb18

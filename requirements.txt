@@ -131,3 +131,6 @@ widgetsnbextension==3.5.1
 wincertstore==0.2
 yarl==1.6.3
 zipp @ file:///tmp/build/80754af9/zipp_1603306325174/work
+
+numpy~=1.19.2
+wget~=3.2
