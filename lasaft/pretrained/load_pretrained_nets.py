@@ -20,7 +20,6 @@ def __define_large_params__():
     # Other Hyper-params
     args['optimizer'] = 'adam'
     args['lr'] = 0.0001
-    args['dev_mode'] = False
     args['train_loss'] = 'spec_mse'
     args['val_loss'] = 'raw_l1'
 
@@ -41,7 +40,7 @@ def __define_large_params__():
     args['tfc_tdf_activation'] = 'relu'
     args['bn_factor'] = 16
     args['min_bn_units'] = 16
-    args['tfc_tdf_bias'] = True
+    args['tfc_tdf_bias'] = False
     args['num_tdfs'] = 6
     args['dk'] = 32
 
@@ -55,7 +54,7 @@ def __define_large_params__():
     args['pocm_type'] = 'matmul'
     args['pocm_norm'] = 'batch_norm'
 
-    args['auto_lr_schedule'] = False
+    args['auto_lr_schedule'] = True
     return DCUN_TFC_GPoCM_LaSAFT_Framework(**args)
 
 
