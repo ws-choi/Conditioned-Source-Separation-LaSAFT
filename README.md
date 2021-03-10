@@ -100,7 +100,7 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
         ```shell script
         python main.py --problem_name conditioned_separation --mode train --musdb_root etc/musdb18_dev_wav --gpus 1 --precision 16 --batch_size 8 --num_workers 0 --pin_memory True --save_top_k 3 --save_weights_only True --patience 10 --lr 0.001 --deterministic --model CUNET_TFC_GPoCM_LaSAFT --log False
         ```
-- Table 2 in [1]
+- Table 2 in [1] (Multi-GPUs Version)
 
     - GPoCM CUNet + LaSAFT (* proposed model) 
         ```shell script
