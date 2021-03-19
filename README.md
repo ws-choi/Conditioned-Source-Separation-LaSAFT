@@ -4,7 +4,7 @@
 
 Check separated samples on this [demo page](https://lasaft.github.io/)!
 
-An official Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation" (accepted to ICASSP 2021)
+An official Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation" (accepted to ICASSP 2021. ([slide](https://lightsaft.github.io/slide/gaudio/#22)))
 
 ## Demonstration: A Pretrained Model
 
@@ -108,8 +108,6 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
 
         ```
 
-   
-
 ## You can cite this paper as follows:
 
 > @misc{choi2020lasaft,
@@ -120,6 +118,16 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
       archivePrefix={arXiv},
       primaryClass={cs.SD}
 }
+
+### LaSAFT: Latent Source Attentive Frequency Transformation
+
+![](https://imgur.com/vQNgttJ.png)
+
+### GPoCM: Gated Point-wise Convolutional Modulation
+
+![](https://imgur.com/9A4otVA.png)
+
+
 ## Reference
 
 [1]  Woosung Choi,  Minseok Kim,  Jaehwa Chung, and Soonyoung Jung, “LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation.,” arXiv preprint arXiv:2010.11631 (2020).  
