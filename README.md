@@ -107,6 +107,7 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
         python main.py --problem_name conditioned_separation --mode train --musdb_root ../repos/musdb18_wav --n_blocks 9 --num_tdfs 6 --n_fft 4096 --hop_length 1024 --precision 16 --embedding_dim 64 --pin_memory True --save_top_k 3 --patience 10 --deterministic --model CUNET_TFC_GPoCM_LaSAFT --gpus 4 --distributed_backend ddp --sync_batchnorm True --run_id lasaft_2020 --batch_size 4 --seed 2020 --log False --lr 0.0001 --auto_lr_schedule True 
 
         ```
+### 4. [Evaluation](https://github.com/ws-choi/Conditioned-Source-Separation-LaSAFT/issues/15#issuecomment-807883207)
 
 ## You can cite this paper as follows:
 
