@@ -140,3 +140,4 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
 - The original Conditional U-Net 
     - [tensorflow version](https://github.com/gabolsgabs/cunet) (official)
     - [pytorch version](https://github.com/ws-choi/Conditioned-U-Net-pytorch)
+    - [run over CPU in a Docker container - by loretoparisi](https://github.com/loretoparisi/Conditioned-Source-Separation-LaSAFT)
