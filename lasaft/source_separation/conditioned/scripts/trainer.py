@@ -8,6 +8,7 @@ from pathlib import Path
 from pytorch_lightning import Trainer, seed_everything
 
 from lasaft.data.data_provider import DataProvider
+from lasaft.pretrained.load_pretrained_nets import PreTrainedLightSAFTNet
 from lasaft.source_separation.model_definition import get_class_by_name
 from lasaft.utils.functions import mkdir_if_not_exists
 
@@ -18,25 +19,15 @@ def train(param):
     else:
         args = param
 
-    framework = get_class_by_name('conditioned_separation', args['model'])
-    if args['spec_type'] != 'magnitude':
-        args['input_channels'] = 4
+    seed_everything(args['seed'])
 
-    if args['resume_from_checkpoint'] is None:
-        if args['seed'] is not None:
-            seed_everything(args['seed'])
-
-    model = framework(**args)
-
-    if args['last_activation'] != 'identity' and args['spec_est_mode'] != 'masking':
-        warn('Please check if you really want to use a mapping-based spectrogram estimation method '
-             'with a final activation function. ')
+    model = PreTrainedLightSAFTNet('lightsaft_medium_train')
     ##########################################################
 
     # -- checkpoint
     ckpt_path = Path(args['ckpt_root_path'])
     mkdir_if_not_exists(ckpt_path)
-    ckpt_path = ckpt_path.joinpath(args['model'])
+    ckpt_path = ckpt_path.joinpath('lightsaft')
     mkdir_if_not_exists(ckpt_path)
     run_id = args['run_id']
     ckpt_path = ckpt_path.joinpath(run_id)
@@ -47,21 +38,9 @@ def train(param):
         filepath=ckpt_path,
         save_top_k=save_top_k,
         verbose=False,
-        monitor='val_loss',
-        save_last=False,
-        save_weights_only=args['save_weights_only']
+        monitor='val_loss'
     )
     args['checkpoint_callback'] = checkpoint_callback
-
-    # -- early stop
-    patience = args['patience']
-    early_stop_callback = EarlyStopping(
-        monitor='val_loss',
-        min_delta=0.0,
-        patience=patience,
-        verbose=False
-    )
-    args['early_stop_callback'] = early_stop_callback
 
     if args['resume_from_checkpoint'] is not None:
         run_id = run_id + "_resume_" + args['resume_from_checkpoint']
@@ -100,9 +79,9 @@ def train(param):
                     'batch_size': args['batch_size'],
                     'num_workers': args['num_workers'],
                     'pin_memory': args['pin_memory'],
-                    'num_frame': args['num_frame'],
-                    'hop_length': args['hop_length'],
-                    'n_fft': args['n_fft']}
+                    'num_frame': model.num_frame,
+                    'hop_length': model.hop_length,
+                    'n_fft': model.n_fft}
 
     dp = DataProvider(**dataset_args)
     train_dataset, training_dataloader = dp.get_training_dataset_and_loader()
