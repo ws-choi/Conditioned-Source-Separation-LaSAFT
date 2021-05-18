@@ -90,7 +90,7 @@ def __define_small_params__(is_light=False):
 
     # Other Hyper-params
     args['optimizer'] = 'adam'
-    args['lr'] = 0.004
+    args['lr'] = 0.0005
     args['train_loss'] = 'spec_mse'
     args['val_loss'] = 'raw_l1'
 
