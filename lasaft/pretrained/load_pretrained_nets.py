@@ -76,7 +76,8 @@ def PreTrainedLaSAFTNet(model_name='lasaft_large_2020'):
     else:
         raise ModuleNotFoundError
 
-def __define_small_params__(is_light=False):
+
+def __define_medium_params__(is_light=False):
     args = {}
 
     # FFT params
@@ -90,12 +91,12 @@ def __define_small_params__(is_light=False):
 
     # Other Hyper-params
     args['optimizer'] = 'adam'
-    args['lr'] = 0.004
+    args['lr'] = 0.001
     args['train_loss'] = 'spec_mse'
     args['val_loss'] = 'raw_l1'
 
     # DenseNet Hyper-params
-    args['n_blocks'] = 9
+    args['n_blocks'] = 11
     args['input_channels'] = 4
     args['internal_channels'] = 16
     args['first_conv_activation'] = 'relu'
@@ -119,7 +120,7 @@ def __define_small_params__(is_light=False):
     args['embedding_dim'] = 64
     args['condition_to'] = 'decoder'
 
-    args['control_n_layer'] = 4
+    args['control_n_layer'] = 6
     args['control_type'] = 'dense'
     args['pocm_type'] = 'matmul'
     args['pocm_norm'] = 'batch_norm'
@@ -141,7 +142,7 @@ def PreTrainedLightSAFTNet(model_name):
         print('successfully downloaded the pretrained model.')
 
     if 'medium_' in model_name:
-        return __define_small_params__(is_light=True)
+        return __define_medium_params__(is_light=True)
         pass
     elif 'large' in model_name:
         model = __define_large_params__()
