@@ -111,14 +111,18 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
 
 ## You can cite this paper as follows:
 
-> @misc{choi2020lasaft,
-      title={LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation}, 
-      author={Woosung Choi and Minseok Kim and Jaehwa Chung and Soonyoung Jung},
-      year={2020},
-      eprint={2010.11631},
-      archivePrefix={arXiv},
-      primaryClass={cs.SD}
-}
+```bibtex
+@INPROCEEDINGS{9413896,
+  author={Choi, Woosung and Kim, Minseok and Chung, Jaehwa and Jung, Soonyoung},
+  booktitle={ICASSP 2021 - 2021 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
+  title={Lasaft: Latent Source Attentive Frequency Transformation For Conditioned Source Separation}, 
+  year={2021},
+  volume={},
+  number={},
+  pages={171-175},
+  doi={10.1109/ICASSP39728.2021.9413896}}
+```
+
 
 ### LaSAFT: Latent Source Attentive Frequency Transformation
 
