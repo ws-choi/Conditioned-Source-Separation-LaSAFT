@@ -4,7 +4,7 @@
 
 Check separated samples on this [demo page](https://lasaft.github.io/)!
 
-An official Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation" (accepted to ICASSP 2021. ([slide](https://lightsaft.github.io/slide/gaudio/#22)))
+An official Pytorch Implementation of the paper "LaSAFT: Latent Source Attentive Frequency Transformation for Conditioned Source Separation" (accepted to ICASSP 2021. ([slide](https://ws-choi.github.io/Conditioned-Source-Separation-LaSAFT/)))
 
 ## Demonstration: A Pretrained Model
 
