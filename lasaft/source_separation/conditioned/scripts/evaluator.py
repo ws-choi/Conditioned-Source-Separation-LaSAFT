@@ -1,7 +1,7 @@
 import inspect
 from warnings import warn
 
-from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.loggers import WandbLogger, CSVLogger
 
 from lasaft.data.data_provider import DataProvider
 from lasaft.source_separation.model_definition import get_class_by_name
@@ -53,6 +53,9 @@ def eval(param):
                                      name=args['run_id'] + '_eval_' + args['epoch'].replace('=','_'))
         args['logger'].log_hyperparams(model.hparams)
         args['logger'].watch(model, log='all')
+    elif log == 'csv':
+        mkdir_if_not_exists('etc/csv_logs')
+        args['logger'] = CSVLogger('etc/csv_logs', name=args['run_id'] + '_eval')
     elif log == 'tensorboard':
         raise NotImplementedError
     else:

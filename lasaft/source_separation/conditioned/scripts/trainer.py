@@ -2,7 +2,7 @@ import inspect
 from warnings import warn
 
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from pytorch_lightning.loggers import WandbLogger
+from pytorch_lightning.loggers import WandbLogger, CSVLogger
 
 from pathlib import Path
 from pytorch_lightning import Trainer, seed_everything
@@ -83,6 +83,9 @@ def train(param):
         args['logger'] = WandbLogger(project='lasaft_exp', tags=[model_name], offline=False, name=run_id)
         args['logger'].log_hyperparams(model.hparams)
         args['logger'].watch(model, log='all')
+    elif log == 'csv':
+        mkdir_if_not_exists('etc/csv_logs')
+        args['logger'] = CSVLogger('etc/csv_logs', name=run_id)
     elif log == 'tensorboard':
         raise NotImplementedError
     else:
