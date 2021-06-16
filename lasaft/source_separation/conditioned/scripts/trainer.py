@@ -1,6 +1,8 @@
 import inspect
 from warnings import warn
+from packaging import version
 
+import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from pytorch_lightning.loggers import WandbLogger
 
@@ -43,13 +45,22 @@ def train(param):
     mkdir_if_not_exists(ckpt_path)
     save_top_k = args['save_top_k']
 
+    kwargs = {
+        'filepath': ckpt_path,
+        'save_top_k': save_top_k,
+        'verbose': False,
+        'monitor': 'val_loss',
+        'save_last': False,
+        'save_weights_only': args['save_weights_only']
+    }
+
+    if(version.parse(pl.__version__) > version.parse('1.3.0')):
+        kwargs['dirpath'] = ckpt_path
+        del(kwargs['filepath'])
+
+
     checkpoint_callback = ModelCheckpoint(
-        filepath=ckpt_path,
-        save_top_k=save_top_k,
-        verbose=False,
-        monitor='val_loss',
-        save_last=False,
-        save_weights_only=args['save_weights_only']
+        **kwargs
     )
     args['checkpoint_callback'] = checkpoint_callback
 
