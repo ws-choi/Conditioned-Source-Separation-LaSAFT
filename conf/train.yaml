@@ -1,0 +1,5 @@
+defaults:
+  - trainer: default
+  - dataset: default
+  - model: conditioned_separation/lasaft_net
+  - training: default

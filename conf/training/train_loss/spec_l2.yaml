@@ -1,0 +1,2 @@
+_target_: lasaft.source_separation.conditioned.loss_functions.Conditional_Spectrogram_Loss
+mode: l2

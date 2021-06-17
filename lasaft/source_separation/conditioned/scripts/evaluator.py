@@ -1,5 +1,9 @@
-import inspect
 from warnings import warn
+from packaging import version
+
+import pytorch_lightning as pl
+from omegaconf import DictConfig
+from hydra.utils import to_absolute_path
 
 from pytorch_lightning.loggers import WandbLogger
 
@@ -9,81 +13,68 @@ from lasaft.utils.functions import mkdir_if_not_exists
 from pathlib import Path
 from pytorch_lightning import Trainer
 
+from lasaft.utils.instantiator import HydraInstantiator as HI
 
-def eval(param):
 
-    if not isinstance(param, dict):
-        args = vars(param)
-    else:
-        args = param
-
-    for key in args.keys():
-        if args[key] == 'None':
-            args[key] = None
-
-    if args['gpu_index'] is not None:
-        args['gpus'] = str(args['gpu_index'])
+def eval(cfg: DictConfig):
+    # requires
+    if(cfg['eval']['run_id'] is None):
+        raise ValueError("Required eval.run_id is missing.")
+    if(cfg['eval']['epoch'] is None):
+        raise ValueError("Required eval.epoch is missing.")
 
     # MODEL
-    ##########################################################
-    # # # get framework
-    framework = get_class_by_name('conditioned_separation', args['model'])
-    if args['spec_type'] != 'magnitude':
-        args['input_channels'] = 4
-    # # # Model instantiation
-    from copy import deepcopy as c
-    model_args = c(args)
-    model = framework(**model_args)
-    ##########################################################
+    if cfg['model']['spec_type'] != 'magnitude':
+        cfg['model']['input_channels'] = 4
+
+    model = HI.model(cfg)
 
     # Trainer Definition
 
     # -- checkpoint
-    ckpt_path = Path(args['ckpt_root_path']).joinpath(args['model']).joinpath(args['run_id'])
-    ckpt_path = '{}/{}'.format(str(ckpt_path), args['epoch'])
+    ckpt_path = Path(to_absolute_path(cfg['eval']['ckpt_root_path']))
+    ckpt_path = ckpt_path.joinpath(cfg['model']['_target_'].split('.')[-1])
+    ckpt_path = ckpt_path.joinpath(cfg['eval']['run_id'])
+    ckpt_path = '{}/{}'.format(str(ckpt_path), cfg['eval']['epoch'])
 
     # -- logger setting
-    log = args['log']
+    trainer_kwargs = {}
+    model_name = model.spec2spec.__class__.__name__
+    log = cfg['training']['log']
     if log == 'False':
-        args['logger'] = False
-        args['checkpoint_callback'] = False
-        args['early_stop_callback'] = False
+        trainer_kwargs['logger'] = False
+        trainer_kwargs['checkpoint_callback'] = False
+        trainer_kwargs['early_stop_callback'] = False
     elif log == 'wandb':
-        args['logger'] = WandbLogger(project='lasaft_exp', tags=args['model'], offline=False,
-                                     name=args['run_id'] + '_eval_' + args['epoch'].replace('=','_'))
-        args['logger'].log_hyperparams(model.hparams)
-        args['logger'].watch(model, log='all')
+        trainer_kwargs['logger'] = WandbLogger(project='lasaft_exp', tags=[model_name], offline=False,
+                                     name=cfg['eval']['run_id'] + '_eval_' + cfg['eval']['epoch'].replace('=','_'))
+        trainer_kwargs['logger'].log_hyperparams(model.hparams)
+        trainer_kwargs['logger'].watch(model, log='all')
     elif log == 'tensorboard':
         raise NotImplementedError
     else:
-        args['logger'] = True  # default
+        trainer_kwargs['logger'] = True  # default
         default_save_path = 'etc/lightning_logs'
         mkdir_if_not_exists(default_save_path)
+    
+    if(version.parse(pl.__version__) > version.parse('1.3.0')):
+        if log == 'False':
+            trainer_kwargs['callbacks'] = [trainer_kwargs['checkpoint_callback'], trainer_kwargs['early_stop_callback']]
+            del(trainer_kwargs['checkpoint_callback'])
+            del(trainer_kwargs['early_stop_callback'])
 
     # Trainer
-    if isinstance(args['gpus'], int):
-        if args['gpus'] > 1:
+    if isinstance(cfg['trainer']['gpus'], int):
+        if cfg['trainer']['gpus'] > 1:
             warn('# gpu and num_workers should be 1, Not implemented: museval for distributed parallel')
-            args['gpus'] = 1
-            args['distributed_backend'] = None
-
-    valid_kwargs = inspect.signature(Trainer.__init__).parameters
-    trainer_kwargs = dict((name, args[name]) for name in valid_kwargs if name in args)
+            cfg['trainer']['gpus'] = 1
+            cfg['trainer']['distributed_backend'] = None
 
     # DATASET
-    ##########################################################
-    dataset_args = {'musdb_root': args['musdb_root'],
-                    'batch_size': args['batch_size'],
-                    'num_workers': args['num_workers'],
-                    'pin_memory': args['pin_memory'],
-                    'num_frame': args['num_frame'],
-                    'hop_length': args['hop_length'],
-                    'n_fft': args['n_fft']}
-    dp = DataProvider(**dataset_args)
-    ##########################################################
+    dp = HI.data_provider(cfg)
 
-    trainer_kwargs['precision'] = 32
-    trainer = Trainer(**trainer_kwargs)
+    cfg['trainer']['precision'] = 32
+    trainer = HI.trainer(cfg, **trainer_kwargs)
     _, test_data_loader = dp.get_test_dataset_and_loader()
     model = model.load_from_checkpoint(ckpt_path)
 

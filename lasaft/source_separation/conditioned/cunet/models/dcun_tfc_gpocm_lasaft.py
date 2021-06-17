@@ -137,21 +137,3 @@ class DCUN_TFC_GPoCM_LaSAFT_Framework(DenseCUNet_GPoCM_Framework):
         hp = [key for key in valid_kwargs.keys() if key not in ['self', 'kwargs']]
         hp = hp + [key for key in kwargs if not callable(kwargs[key])]
         self.save_hyperparameters(*hp)
-
-    @staticmethod
-    def add_model_specific_args(parent_parser):
-        parser = ArgumentParser(parents=[parent_parser], add_help=False)
-
-        parser.add_argument('--n_internal_layers', type=int, default=5)
-
-        parser.add_argument('--kernel_size_t', type=int, default=3)
-        parser.add_argument('--kernel_size_f', type=int, default=3)
-
-        parser.add_argument('--bn_factor', type=int, default=16)
-        parser.add_argument('--min_bn_units', type=int, default=16)
-        parser.add_argument('--tfc_tdf_bias', type=bool, default=False)
-        parser.add_argument('--tfc_tdf_activation', type=str, default='relu')
-
-        parser.add_argument('--num_tdfs', type=int, default=6)
-        parser.add_argument('--dk', type=int, default=32)
-        return DenseCUNet_GPoCM_Framework.add_model_specific_args(parser)

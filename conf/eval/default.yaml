@@ -1,0 +1,5 @@
+ckpt_root_path: 'etc/checkpoints'
+log: True
+run_id: null
+save_weights_only: False
+epoch: null

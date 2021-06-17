@@ -49,7 +49,7 @@ def string_to_list(int_list):
 
 def mkdir_if_not_exists(default_save_path):
     if not os.path.exists(default_save_path):
-        os.mkdir(default_save_path)
+        os.makedirs(default_save_path)
 
 
 def get_estimation(idx, target_name, estimation_dict):

@@ -1,0 +1,7 @@
+# @package model
+control_n_layer: 4
+control_type: dense
+film_type: complex
+
+gamma_activation: identity
+beta_activation: identity
