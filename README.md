@@ -106,9 +106,6 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
         python train.py model=conditioned_separation/CUNET_TFC_GPoCM_LightSAFT dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
         ```
 
-python main.py --problem_name conditioned_separation --mode train --musdb_root ../repos/musdb18_wav --n_blocks 9 --num_tdfs 6 --n_fft 4096 --hop_length 1024 --precision 16 --embedding_dim 64 --pin_memory True --save_top_k 3 --patience 10 --deterministic --model CUNET_TFC_GPoCM_LaSAFT --gpus 4 --distributed_backend ddp --sync_batchnorm True --run_id lasaft_2020 --batch_size 4 --seed 2020 --log False --lr 0.0001 --auto_lr_schedule True 
-
-
 - Table 2 in [1] (Multi-GPUs Version)
 
     - GPoCM CUNet + LaSAFT (* proposed model) 
