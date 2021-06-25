@@ -18,6 +18,9 @@ def add_model_specific_args(parent_parser):
 
 
 def get_conditional_loss(loss_name, window_length, hop_length, **kwargs):
+    if type(loss_name) is not str:
+        return loss_name  # already instantiated by Hydra
+
     assert loss_name in ['spec_l1', 'spec_l2', 'spec_mse',
                          'raw_l1', 'raw_l2', 'raw_mse',
                          'sdr_like', 'sdr', 'dsr', 'nsdr', 'ldsr',

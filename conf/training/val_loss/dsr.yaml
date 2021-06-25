@@ -1,0 +1,3 @@
+_target_: lasaft.source_separation.conditioned.loss_functions.Conditional_DSR
+window_length: null  # automatically assign when instantiated
+hop_length: ${dataset.hop_length}

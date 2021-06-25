@@ -9,13 +9,14 @@ import numpy as np
 import soundfile
 import torch
 
+from hydra.utils import to_absolute_path
+
 
 def check_musdb_valid(musdb_train):
     if len(musdb_train) > 0:
         pass
     else:
-        print('It seems like you used wrong path for musdb18 dataset')
-        raise NotImplemented  # TODO: Exception handling
+        raise Exception('It seems like you used wrong path for musdb18 dataset')
 
 
 class MusdbWrapperDataset(Dataset):
@@ -23,7 +24,7 @@ class MusdbWrapperDataset(Dataset):
 
     def __init__(self, musdb_root, subset, n_fft, hop_length, num_frame):
 
-        musdb_root = Path(musdb_root)
+        musdb_root = Path(to_absolute_path(musdb_root))
         self.root = musdb_root.joinpath(subset)
 
         if subset == 'test':

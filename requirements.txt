@@ -134,3 +134,4 @@ zipp @ file:///tmp/build/80754af9/zipp_1603306325174/work
 
 numpy~=1.19.2
 wget~=3.2
+hydra-core==1.1.0

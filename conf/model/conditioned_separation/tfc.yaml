@@ -1,0 +1,7 @@
+# @package model
+n_internal_layers: 5
+
+kernel_size_t: 3
+kernel_size_f: 3
+
+tfc_activation: relu

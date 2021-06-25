@@ -271,23 +271,3 @@ class Dense_CUNet_Framework(Spectrogram_based):
         import soundfile
         soundfile.write('temp.wav', separated, 44100)
         return soundfile.read('temp.wav')[0]
-
-    @staticmethod
-    def add_model_specific_args(parent_parser):
-        parser = ArgumentParser(parents=[parent_parser], add_help=False)
-
-        parser.add_argument('--n_blocks', type=int, default=7)
-        parser.add_argument('--input_channels', type=int, default=4)
-        parser.add_argument('--internal_channels', type=int, default=24)
-        parser.add_argument('--first_conv_activation', type=str, default='relu')
-        parser.add_argument('--last_activation', type=str, default='identity')
-
-        parser.add_argument('--t_down_layers', type=tuple, default=None)
-        parser.add_argument('--f_down_layers', type=tuple, default=None)
-
-        parser.add_argument('--control_vector_type', type=str, default='embedding')
-        parser.add_argument('--control_input_dim', type=int, default=4)
-        parser.add_argument('--embedding_dim', type=int, default=32)
-        parser.add_argument('--condition_to', type=str, default='decoder')
-
-        return Spectrogram_based.add_model_specific_args(parser)

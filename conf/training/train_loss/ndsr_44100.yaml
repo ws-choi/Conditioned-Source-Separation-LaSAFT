@@ -1,0 +1,3 @@
+_target_: lasaft.source_separation.conditioned.loss_functions.Conditional_NSDR
+window_length: 44100
+hop_length: 22050

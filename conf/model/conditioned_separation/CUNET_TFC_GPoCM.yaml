@@ -1,0 +1,10 @@
+# @package model
+defaults:
+  - /model/conditioned_separation/base
+  - /model/conditioned_separation/gpocm
+_target_: lasaft.source_separation.conditioned.cunet.models.dcun_tfc_gpocm.DCUN_TFC_GPoCM_Framework
+
+n_internal_layers: 5
+kernel_size_t: 3
+kernel_size_f: 3
+tfc_activation: relu
