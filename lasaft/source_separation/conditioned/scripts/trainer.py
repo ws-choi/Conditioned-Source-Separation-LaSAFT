@@ -71,10 +71,10 @@ def train(cfg: DictConfig):
 
     trainer_kwargs = {
         'checkpoint_callback': checkpoint_callback,
-        'early_stop_callback': early_stop_callback
+        'callbacks': [early_stop_callback]
     }
 
-    if(version.parse(pl.__version__) > version.parse('1.3.0')):
+    if version.parse(pl.__version__) > version.parse('1.3.0'):
         trainer_kwargs['callbacks'] = [checkpoint_callback, early_stop_callback]
         del(trainer_kwargs['checkpoint_callback'])
         del(trainer_kwargs['early_stop_callback'])

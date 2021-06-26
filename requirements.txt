@@ -64,7 +64,7 @@ numba @ file:///D:/bld/numba_1607010604208/work
 numpy @ file:///C:/ci/numpy_and_numpy_base_1603466732592/work
 oauthlib==3.1.0
 olefile @ file:///home/conda/feedstock_root/build_artifacts/olefile_1602866521163/work
-packaging==20.4
+packaging~=20.9
 pandas==1.2.1
 pandocfilters==1.4.2
 parso @ file:///tmp/build/80754af9/parso_1596826841367/work
@@ -135,3 +135,4 @@ zipp @ file:///tmp/build/80754af9/zipp_1603306325174/work
 numpy~=1.19.2
 wget~=3.2
 hydra-core==1.1.0
+omegaconf~=2.1.0

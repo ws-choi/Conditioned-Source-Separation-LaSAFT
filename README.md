@@ -49,7 +49,7 @@ conda activate lasaft
 (Install)
 ```
 conda install pytorch=1.7.1 cudatoolkit=11.0 -c pytorch
-conda install -c conda-forge ffmpeg librosa=0.6
+conda install -c conda-forge ffmpeg librosa=0.8
 conda install -c anaconda jupyter
 pip install musdb==0.3.1 museval==0.3.0 pytorch_lightning==1.1.6 wandb==0.10.15 pydub==0.24.1 wget hydra-core==1.1.0
 ```
