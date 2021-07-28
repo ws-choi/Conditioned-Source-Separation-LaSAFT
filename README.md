@@ -71,6 +71,9 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
 - main.py includes training scripts for several models described in the paper [1].
     - It provides several options, including pytorch-lightning parameters
 
+- An example of Training/Validation loss (see [wandb report] for more details)
+![](https://raw.githubusercontent.com/ws-choi/Conditioned-Source-Separation-LaSAFT/main/assets/training_example.png)
+
 #### Examples
 
 - Table 1 in [1]
