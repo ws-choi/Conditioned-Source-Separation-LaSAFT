@@ -43,7 +43,7 @@ We highly recommend you to **install environments using scripts below**, even if
 
 ```
 conda env create -f lasaft_env_gpu.yaml -n lasaft
-conda activate lasaft_env_gpu
+conda activate lasaft
 pip install -r requirements.txt
 ```
 
@@ -71,40 +71,39 @@ You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source
 
     - FiLM CUNet
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_FiLM dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
+        python train.py model=conditioned_separation/CUNET_TFC_FiLM dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 logger=wandb
         ```
     - FiLM CUNet + TDF
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_FiLM_TDF dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
+        python train.py model=conditioned_separation/CUNET_TFC_FiLM_TDF dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 logger=wandb
         ```
     - FiLM CUNet + LaSAFT
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_FiLM_LaSAFT dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
+        python train.py model=conditioned_separation/CUNET_TFC_FiLM_LaSAFT dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 logger=wandb
         ```
     
     - GPoCM CUNet
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_GPoCM dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
+        python train.py model=conditioned_separation/CUNET_TFC_GPoCM dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 logger=wandb
         ```
     - GPoCM CUNet + TDF
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_TDF dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
+        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_TDF dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 logger=wandb
         ```
     - GPoCM CUNet + LaSAFT (* proposed model) 
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_LaSAFT dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
+        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_LaSAFT dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 logger=wandb
         ```
     - GPoCM CUNet + LightSAFT
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_LightSAFT dataset.musdb_root=etc/musdb18_dev_wav dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 training.log=False
+        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_LightSAFT dataset.batch_size=8 trainer.precision=16 trainer.gpus=1 training.patience=10 training.lr=0.001 logger=wandb
         ```
 
 - Table 2 in [1] (Multi-GPUs Version)
 
     - GPoCM CUNet + LaSAFT (* proposed model) 
         ```shell script
-        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_LaSAFT dataset.musdb_root=../repos/musdb18_wav model.n_blocks=9 model.num_tdfs=6 model.embedding_dim=64 dataset.n_fft=4096 dataset.hop_length=1024 trainer.gpus=4 trainer.sync_batchnorm=True trainer.precision=16 trainer.accelerator=ddp training.patience=10 training.lr=0.001 training.auto_lr_schedule=True training.log=False training.run_id=lasaft-2020
-
+        python train.py model=conditioned_separation/CUNET_TFC_GPoCM_LaSAFT trainer=four_2080tis model.n_blocks=9 model.num_tdfs=6 model.embedding_dim=64 dataset.n_fft=4096 dataset.hop_length=1024 trainer.deterministic=True training.patience=10 training.lr=0.001 training.auto_lr_schedule=True logger=wandb training.run_id=lasaft-2020
         ```
 
 #### tunable hyperparameters

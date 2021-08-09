@@ -3,7 +3,7 @@ import hydra
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning.utilities.distributed import rank_zero_info
 from lasaft.source_separation.conditioned.scripts import trainer as trainer
-from lasaft.utils.functions import mkdir_if_not_exists
+from lasaft.utils.functions import mkdir_if_not_exists, print_config
 
 dotenv.load_dotenv(override=True)
 
@@ -15,6 +15,10 @@ def main(cfg: DictConfig):
     # Environment Setup
     mkdir_if_not_exists('etc')
     mkdir_if_not_exists('etc/checkpoints')
+
+    # Pretty print config using Rich library
+    if cfg.get("print_config"):
+        print_config(cfg, resolve=True)
 
     trainer.train(cfg)
 
