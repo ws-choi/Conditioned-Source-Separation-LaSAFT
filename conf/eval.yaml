@@ -4,3 +4,4 @@ defaults:
   - model: conditioned_separation/lasaft_net
   - training: default
   - eval: default
+  - logger: wandb

@@ -3,6 +3,7 @@ from warnings import warn
 import numpy as np
 import torch
 import torch.nn as nn
+import wandb
 
 
 def get_activation_by_name(activation):
@@ -63,3 +64,7 @@ def get_estimation(idx, target_name, estimation_dict):
 
 def flat_word_set(word_set):
     return [subword for word in word_set for subword in word.split(' ')]
+
+
+def wandb_login(key):
+    wandb.login(key=key)

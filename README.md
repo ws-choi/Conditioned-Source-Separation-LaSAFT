@@ -40,18 +40,11 @@ other = model.separate_track(audio, 'other')
 
 We highly recommend you to **install environments using scripts below**, even if we uploaded the [pip-requirements.txt](https://github.com/ws-choi/Conditioned-Source-Separation-LaSAFT/blob/main/requirements.txt)
 
-(Optional)
-```
-conda create -n lasaft
-conda activate lasaft
-```
 
-(Install)
 ```
-conda install pytorch=1.7.1 cudatoolkit=11.0 -c pytorch
-conda install -c conda-forge ffmpeg librosa=0.8
-conda install -c anaconda jupyter
-pip install musdb==0.3.1 museval==0.3.0 pytorch_lightning==1.1.6 wandb==0.10.15 pydub==0.24.1 wget hydra-core==1.1.0
+conda env create -f lasaft_env_gpu.yaml -n lasaft
+conda activate lasaft_env_gpu
+pip install -r requirements.txt
 ```
 
 ### 2. Dataset: Musdb18

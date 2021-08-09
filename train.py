@@ -1,8 +1,11 @@
+import dotenv
 import hydra
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning.utilities.distributed import rank_zero_info
 from lasaft.source_separation.conditioned.scripts import trainer as trainer
 from lasaft.utils.functions import mkdir_if_not_exists
+
+dotenv.load_dotenv(override=True)
 
 
 def main(cfg: DictConfig):

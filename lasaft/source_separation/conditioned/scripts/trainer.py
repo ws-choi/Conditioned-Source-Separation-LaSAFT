@@ -1,4 +1,6 @@
 from warnings import warn
+
+import hydra.utils
 from packaging import version
 
 from omegaconf import DictConfig
@@ -11,7 +13,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pathlib import Path
 from pytorch_lightning import seed_everything
 
-from lasaft.utils.functions import mkdir_if_not_exists
+from lasaft.utils.functions import mkdir_if_not_exists, wandb_login
 
 from lasaft.utils.instantiator import HydraInstantiator as HI
 
@@ -51,7 +53,7 @@ def train(cfg: DictConfig):
         'save_weights_only': cfg['training']['save_weights_only']
     }
 
-    if(version.parse(pl.__version__) > version.parse('1.3.0')):
+    if version.parse(pl.__version__) > version.parse('1.3.0'):
         checkpoint_kwargs['dirpath'] = ckpt_path
         del(checkpoint_kwargs['filepath'])
 
@@ -76,8 +78,10 @@ def train(cfg: DictConfig):
 
     if version.parse(pl.__version__) > version.parse('1.3.0'):
         trainer_kwargs['callbacks'] = [checkpoint_callback, early_stop_callback]
-        del(trainer_kwargs['checkpoint_callback'])
-        del(trainer_kwargs['early_stop_callback'])
+        if 'checkpoint_callback' in trainer_kwargs.keys():
+            del(trainer_kwargs['checkpoint_callback'])
+        if 'early_stop_callback' in trainer_kwargs.keys():
+            del(trainer_kwargs['early_stop_callback'])
 
     if cfg['trainer']['resume_from_checkpoint'] is not None:
         run_id = run_id + "_resume_" + cfg['trainer']['resume_from_checkpoint']
@@ -92,19 +96,16 @@ def train(cfg: DictConfig):
     model_name = model.spec2spec.__class__.__name__
 
     # -- logger setting
-    log = cfg['training']['log']
-    if log == 'False':
-        trainer_kwargs['logger'] = False
-    elif log == 'wandb':
-        trainer_kwargs['logger'] = WandbLogger(project='lasaft_exp', tags=[model_name], offline=False, name=run_id)
-        trainer_kwargs['logger'].log_hyperparams(model.hparams)
-        trainer_kwargs['logger'].watch(model, log='all')
-    elif log == 'tensorboard':
-        raise NotImplementedError
-    else:
-        trainer_kwargs['logger'] = True  # default
-        default_save_path = 'etc/lightning_logs'
-        mkdir_if_not_exists(default_save_path)
+    if 'logger' in cfg:
+
+        logger = hydra.utils.instantiate(cfg['logger'])
+        if len(logger) > 0:
+            logger = logger['logger']
+            trainer_kwargs['logger'] = logger
+            if isinstance(logger, WandbLogger):
+                wandb_login(key=cfg['wandb_api_key'])
+                logger.log_hyperparams(model.hparams)
+                logger.watch(model, log='all')
 
     # Trainer
     trainer = HI.trainer(cfg, **trainer_kwargs)

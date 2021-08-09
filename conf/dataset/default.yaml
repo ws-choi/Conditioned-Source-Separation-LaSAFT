@@ -1,5 +1,5 @@
 _target_: lasaft.data.data_provider.DataProvider
-musdb_root: etc/musdb18_dev_wav
+musdb_root: ${data_dir}
 batch_size: 8
 num_workers: 0
 pin_memory: True
