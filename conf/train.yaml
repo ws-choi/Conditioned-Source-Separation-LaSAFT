@@ -1,6 +1,7 @@
 defaults:
   - trainer: default
   - dataset: default
+  - callbacks: default
   - model: conditioned_separation/lasaft_net
   - training: default
   - logger: wandb

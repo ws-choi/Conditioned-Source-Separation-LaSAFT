@@ -239,9 +239,15 @@ python eval.py eval.run_id=[RUN_ID] 'eval.epoch=[EPOCH_CKPT]'
 ```
 
 - example
-    ```
-    python eval.py eval.run_id=2021-06-17/19-27-37 'eval.epoch=epoch\=1-step\=107.ckpt' trainer.gpus=1
-    ```
+    - if you trained you model with the following script
+        ```
+        python train.py model=conditioned_separation/CUNET_TFC_FiLM dataset.batch_size=8 trainer=single_gpu training.lr=0.001 logger=wandb
+        ```
+    - suppose that its run_id = 2021-08-09/17-16-26
+    - then run eval scripts like below.
+        ```
+        python eval.py model=conditioned_separation/CUNET_TFC_FiLM eval.ckpt='outputs/2021-08-09/17-16-26/checkpoints/epoch\=00.ckpt' trainer.gpus=1
+        ```
 
 ## You can cite this paper as follows:
 

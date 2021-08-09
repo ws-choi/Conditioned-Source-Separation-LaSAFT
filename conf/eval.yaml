@@ -5,3 +5,18 @@ defaults:
   - training: default
   - eval: default
   - logger: wandb
+
+# pretty print config at the start of the run using Rich library
+print_config: True
+
+# disable python warnings if they annoy you
+ignore_warnings: True
+
+# learn more here: https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
+work_dir: ${hydra:runtime.cwd}
+
+# personal settings
+data_dir: ${oc.env:data_dir}
+wandb_api_key: ${oc.env:wandb_api_key}
+
+debug: False

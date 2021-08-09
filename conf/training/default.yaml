@@ -1,8 +1,6 @@
 defaults:
   - train_loss: spec_mse
   - val_loss: raw_l1
-ckpt_root_path: 'etc/checkpoints'
-log: True
 run_id: ${now:%Y-%m-%d}/${now:%H-%M-%S}
 save_weights_only: False
 optimizer: adam

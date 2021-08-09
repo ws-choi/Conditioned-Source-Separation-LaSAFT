@@ -12,10 +12,6 @@ def main(cfg: DictConfig):
     # Load config
     rank_zero_info(OmegaConf.to_yaml(cfg))
 
-    # Environment Setup
-    mkdir_if_not_exists('etc')
-    mkdir_if_not_exists('etc/checkpoints')
-
     # Pretty print config using Rich library
     if cfg.get("print_config"):
         print_config(cfg, resolve=True)
