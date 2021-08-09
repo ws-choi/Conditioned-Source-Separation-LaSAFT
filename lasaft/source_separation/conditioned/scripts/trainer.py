@@ -13,7 +13,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pathlib import Path
 from pytorch_lightning import seed_everything
 
-from lasaft.utils.functions import mkdir_if_not_exists, wandb_login
+from lasaft.utils.functions import mkdir_if_not_exists, wandb_login, log_hyperparameters
 
 from lasaft.utils.instantiator import HydraInstantiator as HI
 
@@ -104,7 +104,6 @@ def train(cfg: DictConfig):
             trainer_kwargs['logger'] = logger
             if isinstance(logger, WandbLogger):
                 wandb_login(key=cfg['wandb_api_key'])
-                logger.log_hyperparams(model.hparams)
                 logger.watch(model, log='all')
 
     # Trainer
@@ -126,6 +125,12 @@ def train(cfg: DictConfig):
 
     if cfg['trainer']['resume_from_checkpoint'] is not None:
         print('resume from the checkpoint')
+
+    log_hyperparameters(
+        config=cfg,
+        model=model,
+        trainer=trainer
+    )
 
     trainer.fit(model, training_dataloader, validation_dataloader)
 

@@ -35,7 +35,7 @@ truncated_bptt_steps: null
 resume_from_checkpoint: null
 profiler: null
 benchmark: False
-deterministic: False
+deterministic: True
 reload_dataloaders_every_epoch: False
 auto_lr_find: False
 replace_sampler_ddp: True
