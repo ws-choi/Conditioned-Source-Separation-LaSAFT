@@ -1,0 +1,5 @@
+_target_: lasaft.source_separation.conditioned.loss_functions.Conditional_Raw_And_Spec
+loss_raw_scale: null
+loss_raw_mode: null
+loss_spec_scale: null
+loss_spec_mode: null

@@ -1,0 +1,3 @@
+# @package model
+defaults:
+  - conditioned_separation/CUNET_TFC_GPoCM_LightSAFT # add args from CUNET_TFC_GPoCM_LightSAFT model conf

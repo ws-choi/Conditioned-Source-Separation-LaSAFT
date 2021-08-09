@@ -1,89 +1,61 @@
-import inspect
 from warnings import warn
+
+import hydra
+from packaging import version
+
+import pytorch_lightning as pl
+from omegaconf import DictConfig
+from hydra.utils import to_absolute_path
 
 from pytorch_lightning.loggers import WandbLogger
 
 from lasaft.data.data_provider import DataProvider
 from lasaft.source_separation.model_definition import get_class_by_name
-from lasaft.utils.functions import mkdir_if_not_exists
+from lasaft.utils.functions import mkdir_if_not_exists, wandb_login
 from pathlib import Path
 from pytorch_lightning import Trainer
 
+from lasaft.utils.instantiator import HydraInstantiator as HI
 
-def eval(param):
 
-    if not isinstance(param, dict):
-        args = vars(param)
-    else:
-        args = param
-
-    for key in args.keys():
-        if args[key] == 'None':
-            args[key] = None
-
-    if args['gpu_index'] is not None:
-        args['gpus'] = str(args['gpu_index'])
+def eval(cfg: DictConfig):
+    if cfg['eval']['ckpt'] is None:
+        raise ValueError("Required eval.ckpt is missing.")
 
     # MODEL
-    ##########################################################
-    # # # get framework
-    framework = get_class_by_name('conditioned_separation', args['model'])
-    if args['spec_type'] != 'magnitude':
-        args['input_channels'] = 4
-    # # # Model instantiation
-    from copy import deepcopy as c
-    model_args = c(args)
-    model = framework(**model_args)
-    ##########################################################
+    if cfg['model']['spec_type'] != 'magnitude':
+        cfg['model']['input_channels'] = 4
+
+    model = HI.model(cfg)
 
     # Trainer Definition
 
     # -- checkpoint
-    ckpt_path = Path(args['ckpt_root_path']).joinpath(args['model']).joinpath(args['run_id'])
-    ckpt_path = '{}/{}'.format(str(ckpt_path), args['epoch'])
+    ckpt_path = Path(to_absolute_path(cfg['eval']['ckpt']))
 
     # -- logger setting
-    log = args['log']
-    if log == 'False':
-        args['logger'] = False
-        args['checkpoint_callback'] = False
-        args['early_stop_callback'] = False
-    elif log == 'wandb':
-        args['logger'] = WandbLogger(project='lasaft_exp', tags=args['model'], offline=False,
-                                     name=args['run_id'] + '_eval_' + args['epoch'].replace('=','_'))
-        args['logger'].log_hyperparams(model.hparams)
-        args['logger'].watch(model, log='all')
-    elif log == 'tensorboard':
-        raise NotImplementedError
-    else:
-        args['logger'] = True  # default
-        default_save_path = 'etc/lightning_logs'
-        mkdir_if_not_exists(default_save_path)
+    if 'logger' in cfg:
+
+        logger = hydra.utils.instantiate(cfg['logger'])
+        model_name = model.spec2spec.__class__.__name__
+        if len(logger) > 0:
+            logger = logger['logger']
+            if isinstance(logger, WandbLogger):
+                wandb_login(key=cfg['wandb_api_key'])
+                logger.watch(model, log='all')
 
     # Trainer
-    if isinstance(args['gpus'], int):
-        if args['gpus'] > 1:
+    if isinstance(cfg['trainer']['gpus'], int):
+        if cfg['trainer']['gpus'] > 1:
             warn('# gpu and num_workers should be 1, Not implemented: museval for distributed parallel')
-            args['gpus'] = 1
-            args['distributed_backend'] = None
-
-    valid_kwargs = inspect.signature(Trainer.__init__).parameters
-    trainer_kwargs = dict((name, args[name]) for name in valid_kwargs if name in args)
+            cfg['trainer']['gpus'] = 1
+            cfg['trainer']['distributed_backend'] = None
 
     # DATASET
-    ##########################################################
-    dataset_args = {'musdb_root': args['musdb_root'],
-                    'batch_size': args['batch_size'],
-                    'num_workers': args['num_workers'],
-                    'pin_memory': args['pin_memory'],
-                    'num_frame': args['num_frame'],
-                    'hop_length': args['hop_length'],
-                    'n_fft': args['n_fft']}
-    dp = DataProvider(**dataset_args)
-    ##########################################################
+    dp = HI.data_provider(cfg)
 
-    trainer_kwargs['precision'] = 32
-    trainer = Trainer(**trainer_kwargs)
+    cfg['trainer']['precision'] = 32
+    trainer = HI.trainer(cfg, logger=logger, _convert_="partial")
     _, test_data_loader = dp.get_test_dataset_and_loader()
     model = model.load_from_checkpoint(ckpt_path)
 

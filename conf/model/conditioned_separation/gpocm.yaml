@@ -1,0 +1,7 @@
+# @package model
+
+control_n_layer: 4
+control_type: dense
+
+pocm_type: matmul
+pocm_norm: batch_norm

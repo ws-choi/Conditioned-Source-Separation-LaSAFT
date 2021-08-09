@@ -103,15 +103,3 @@ class DenseCUNet_GPoCM_Framework(Dense_CUNet_Framework):
             optimizer, lr, auto_lr_schedule,
             train_loss, val_loss
         )
-
-    @staticmethod
-    def add_model_specific_args(parent_parser):
-        parser = ArgumentParser(parents=[parent_parser], add_help=False)
-
-        parser.add_argument('--control_n_layer', type=int, default=4)
-        parser.add_argument('--control_type', type=str, default='dense')
-
-        parser.add_argument('--pocm_type', type=str, default='matmul')
-        parser.add_argument('--pocm_norm', type=str, default='batch_norm')
-
-        return Dense_CUNet_Framework.add_model_specific_args(parser)

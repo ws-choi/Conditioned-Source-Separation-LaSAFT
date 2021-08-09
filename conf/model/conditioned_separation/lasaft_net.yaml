@@ -1,0 +1,3 @@
+# @package model
+defaults:
+  - conditioned_separation/CUNET_TFC_GPoCM_LaSAFT # add args from CUNET_TFC_GPoCM_LaSAFT model conf

@@ -30,7 +30,7 @@
     musdbconvert <your_DIR> <target_DIR> 
     ```
   
-  - for example, ```musdbconvert etc\musdb18_dev etc\musdb18_dev_wav```
+  - for example, ```musdbconvert etc/musdb18_dev etc/musdb18_dev_wav```
 
 - musdbconvert is automatically installed if you have installed musdb with:
 

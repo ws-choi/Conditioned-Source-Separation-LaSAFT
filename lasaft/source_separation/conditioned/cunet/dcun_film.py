@@ -180,16 +180,3 @@ class DenseCUNet_FiLM_Framework(Dense_CUNet_Framework):
             restored = self.stft.restore_complex(output_spec)
 
         return restored, output_spec_cache
-
-    @staticmethod
-    def add_model_specific_args(parent_parser):
-        parser = ArgumentParser(parents=[parent_parser], add_help=False)
-
-        parser.add_argument('--control_n_layer', type=int, default=4)
-        parser.add_argument('--control_type', type=str, default='dense')
-        parser.add_argument('--film_type', type=str, default='complex')
-
-        parser.add_argument('--gamma_activation', type=str, default='identity')
-        parser.add_argument('--beta_activation', type=str, default='identity')
-
-        return Dense_CUNet_Framework.add_model_specific_args(parser)
