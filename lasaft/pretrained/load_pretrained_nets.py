@@ -59,8 +59,8 @@ def __define_large_params__():
 
 
 def PreTrainedLaSAFTNet(model_name='lasaft_large_2020'):
-    assert model_name in ['lasaft_large_2020', 'lasaft_large_2021']
-    ckpt = model_name + '.ckpt'
+    assert model_name in ['lasaft_large_2019', 'lasaft_large_2020', 'lasaft_large_2021']
+    ckpt = 'assets/' + model_name + '.ckpt'
 
     if not os.path.exists(ckpt):
         print('no cached checkpoint found.\nautomatic download! please wait until current download is finished')
