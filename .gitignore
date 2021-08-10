@@ -138,4 +138,3 @@ lightning_logs/*
 *.cache
 
 outputs/
-lasaft_large_*.ckpt
