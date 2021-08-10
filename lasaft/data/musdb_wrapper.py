@@ -270,8 +270,8 @@ class SingleTrackSet(Dataset):
         output_mask[:self.trim_length] *= 0
         output_mask[-self.trim_length:] *= 0
         if self.is_overlap:
-            overlapped_index_prev = self.true_samples - self.hop_length + self.trim_length
-            overlapped_index_next = - overlapped_index_prev
+            self.overlapped_index_prev = self.true_samples - self.hop_length + self.trim_length
+            self.overlapped_index_next = - self.overlapped_index_prev
 
         track_idx, start_pos = self.idx_to_track_offset(idx)
 
@@ -284,24 +284,26 @@ class SingleTrackSet(Dataset):
         if start_pos + length > mixture_length:  # last
             right_padding_num += self.true_samples - (mixture_length - start_pos)
             length = None
-            if start_pos != 0:
-                output_mask[: self.true_samples - self.hop_length] *= 0.5
+
+            if self.is_overlap:
+                if start_pos != 0:
+                    output_mask[:self.overlapped_index_prev] *= 0.5
 
         elif start_pos + length + self.trim_length < mixture_length:
             right_padding_num = 0
             length = length + self.trim_length
-            if start_pos != 0:
-                output_mask[: self.true_samples - self.hop_length] *= 0.5
-            if self.true_samples > self.hop_length:
-                output_mask[- self.true_samples + self.hop_length:] *= 0.5
+
+            if self.is_overlap:
+                if start_pos != 0:
+                    output_mask[: self.overlapped_index_prev] *= 0.5
+                if start_pos + self.hop_length < mixture_length:
+                    output_mask[self.overlapped_index_next:] *= 0.5
 
         if start_pos - self.trim_length >= 0:
             left_padding_num = 0
             start_pos = start_pos - self.trim_length
             if length is not None:
                 length = length + self.trim_length
-            if self.true_samples > self.hop_length:
-                output_mask[- self.true_samples + self.hop_length:] *= 0.5
 
         mixture = self.get_audio(start_pos, length)
 

@@ -26,13 +26,21 @@ model = PreTrainedLaSAFTNet(model_name='lasaft_large_2020')
 # audio should be an np(numpy) array of an stereo audio track
 # with dtype of float32
 # shape must be (T, 2)
+# python inference_example.py  assets\footprint.mp3
 
-vocals = model.separate_track(audio, 'vocals') 
-drums = model.separate_track(audio, 'drums') 
-bass = model.separate_track(audio, 'bass') 
-other = model.separate_track(audio, 'other')
+vocals = model.separate_track(audio, 'vocals', overlap_ratio=0.5)
+drums = model.separate_track(audio, 'drums', overlap_ratio=0.5)
+bass = model.separate_track(audio, 'bass', overlap_ratio=0.5)
+other = model.separate_track(audio, 'other', overlap_ratio=0.5)
 ```
 
+### 4. Example code
+
+- [inference_example.py](inference_example.py)
+
+```bash
+python inference_example.py  assets\footprint.mp3
+```
 
 ## Step-by-Step Tutorials
 

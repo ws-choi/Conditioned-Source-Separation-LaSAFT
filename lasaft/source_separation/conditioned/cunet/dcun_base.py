@@ -275,7 +275,19 @@ class Dense_CUNet_Framework(Spectrogram_based):
 
                 separated.append(res)
 
-        separated = np.concatenate(separated, axis=0)
+        if db.is_overlap:
+            output = np.zeros_like(input_signal)
+            hop_length = db.hop_length
+            for i, sep in enumerate(separated):
+                to = sep.shape[0]
+                if i*hop_length + sep.shape[0] > output.shape[0]:
+                    to = sep.shape[0] - (i*hop_length + sep.shape[0] - output.shape[0])
+                output[i*hop_length:i*hop_length+to] += sep[:to]
+            separated = output
+
+        else:
+            separated = np.concatenate(separated, axis=0)
+
 
         import soundfile
         soundfile.write('temp.wav', separated, 44100)
