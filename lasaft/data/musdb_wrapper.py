@@ -75,7 +75,7 @@ class MusdbTrainSet(MusdbWrapperDataset):
                  n_fft=2048,
                  hop_length=1024,
                  num_frame=64):
-        super(MusdbTrainSet, self).__init__(musdb_root, 'train',  n_fft, hop_length, num_frame)
+        super(MusdbTrainSet, self).__init__(musdb_root, 'train', n_fft, hop_length, num_frame)
 
     def __len__(self):
         return sum([length // self.window_length for length in self.lengths]) * len(self.target_names)
@@ -236,23 +236,27 @@ def MusdbTestSetWithGT(musdb_root='etc/musdb18_samples_wav/',
 
 class SingleTrackSet(Dataset):
 
-    def __init__(self, track, hop_length, num_frame):
+    def __init__(self, track, window_length, trim_length, overlap_ratio):
 
         assert len(track.shape) == 2
         assert track.shape[1] == 2  # check stereo audio
+        assert 0 <= overlap_ratio <= 0.5
+        self.is_overlap = 0 < overlap_ratio
 
-        self.hop_length = hop_length
-        self.window_length = hop_length * (num_frame - 1)
-        self.trim_length = get_trim_length(self.hop_length)
+        self.window_length = window_length
+        self.trim_length = trim_length
 
         self.true_samples = self.window_length - 2 * self.trim_length
+        self.hop_length = int(self.true_samples * (1 - overlap_ratio))
+        assert 0.5 * self.true_samples <= self.hop_length <= self.true_samples
 
         self.lengths = [track.shape[0]]
         self.num_tracks = 1
         self.source_names = ['vocals', 'drums', 'bass', 'other']
 
         import math
-        num_chunks = [math.ceil(length / self.true_samples) for length in self.lengths]
+        num_chunks = [math.ceil((length - self.true_samples) / self.hop_length) + 1 for length in self.lengths]
+
         self.acc_chunk_final_ids = [sum(num_chunks[:i + 1]) for i in range(self.num_tracks)]
 
         self.cached = track.astype(np.float32) if track.dtype is not np.float32 else track
@@ -262,6 +266,13 @@ class SingleTrackSet(Dataset):
 
     def __getitem__(self, idx):
 
+        output_mask = torch.ones((self.window_length, 2), requires_grad=False)
+        output_mask[:self.trim_length] *= 0
+        output_mask[-self.trim_length:] *= 0
+        if self.is_overlap:
+            self.overlapped_index_prev = self.true_samples - self.hop_length + self.trim_length
+            self.overlapped_index_next = - self.overlapped_index_prev
+
         track_idx, start_pos = self.idx_to_track_offset(idx)
 
         length = self.true_samples
@@ -269,9 +280,30 @@ class SingleTrackSet(Dataset):
         if track_idx is None:
             raise StopIteration
         mixture_length = self.lengths[track_idx]
+
         if start_pos + length > mixture_length:  # last
             right_padding_num += self.true_samples - (mixture_length - start_pos)
             length = None
+
+            if self.is_overlap:
+                if start_pos != 0:
+                    output_mask[:self.overlapped_index_prev] *= 0.5
+
+        elif start_pos + length + self.trim_length < mixture_length:
+            right_padding_num = 0
+            length = length + self.trim_length
+
+            if self.is_overlap:
+                if start_pos != 0:
+                    output_mask[: self.overlapped_index_prev] *= 0.5
+                if start_pos + self.hop_length < mixture_length:
+                    output_mask[self.overlapped_index_next:] *= 0.5
+
+        if start_pos - self.trim_length >= 0:
+            left_padding_num = 0
+            start_pos = start_pos - self.trim_length
+            if length is not None:
+                length = length + self.trim_length
 
         mixture = self.get_audio(start_pos, length)
 
@@ -280,16 +312,16 @@ class SingleTrackSet(Dataset):
 
         mixture = torch.from_numpy(mixture)
 
-        return mixture
+        return mixture, output_mask
 
     def idx_to_track_offset(self, idx):
 
         for i, last_chunk in enumerate(self.acc_chunk_final_ids):
             if idx < last_chunk:
                 if i != 0:
-                    offset = (idx - self.acc_chunk_final_ids[i - 1]) * self.true_samples
+                    offset = (idx - self.acc_chunk_final_ids[i - 1]) * self.hop_length
                 else:
-                    offset = idx * self.true_samples
+                    offset = idx * self.hop_length
                 return i, offset
 
         return None, None
@@ -297,5 +329,4 @@ class SingleTrackSet(Dataset):
     def get_audio(self, pos=0, length=None):
 
         track = self.cached
-
         return track[pos:pos + length] if length is not None else track[pos:]

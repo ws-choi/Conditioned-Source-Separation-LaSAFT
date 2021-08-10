@@ -8,6 +8,7 @@ from torch import Tensor
 
 from lasaft.data.musdb_wrapper import SingleTrackSet
 from lasaft.source_separation.conditioned.separation_framework import Spectrogram_based
+from lasaft.utils.fourier import get_trim_length
 from lasaft.utils.functions import get_activation_by_name, string_to_list
 
 
@@ -249,24 +250,44 @@ class Dense_CUNet_Framework(Spectrogram_based):
 
         return restored, output_spec_cache
 
-    def separate_track(self, input_signal, target) -> torch.Tensor:
+    def separate_track(self, input_signal, target, overlap_ratio=0.5) -> torch.Tensor:
 
         import numpy as np
 
         self.eval()
+
         with torch.no_grad():
-                db = SingleTrackSet(input_signal, self.hop_length, self.num_frame)
-                assert target in db.source_names
-                separated = []
 
-                input_condition = np.array(db.source_names.index(target))
-                input_condition = torch.tensor(input_condition, dtype=torch.long, device=self.device).view(1)
+            window_length = self.hop_length * (self.num_frame - 1)
+            trim_length = get_trim_length(self.hop_length)
 
-                for item in db:
-                    separated.append(self.separate(item.unsqueeze(0).to(self.device), input_condition)[0]
-                                     [self.trim_length:-self.trim_length].detach().cpu().numpy())
+            db = SingleTrackSet(input_signal, window_length, trim_length, overlap_ratio)
+            assert target in db.source_names
+            separated = []
 
-        separated = np.concatenate(separated, axis=0)
+            input_condition = np.array(db.source_names.index(target))
+            input_condition = torch.tensor(input_condition, dtype=torch.long, device=self.device).view(1)
+
+            for item, mask in db:
+                res = self.separate(item.unsqueeze(0).to(self.device), input_condition)[0]
+                res = res * mask.to(self.device)
+                res = res[self.trim_length:-self.trim_length].detach().cpu().numpy()
+
+                separated.append(res)
+
+        if db.is_overlap:
+            output = np.zeros_like(input_signal)
+            hop_length = db.hop_length
+            for i, sep in enumerate(separated):
+                to = sep.shape[0]
+                if i*hop_length + sep.shape[0] > output.shape[0]:
+                    to = sep.shape[0] - (i*hop_length + sep.shape[0] - output.shape[0])
+                output[i*hop_length:i*hop_length+to] += sep[:to]
+            separated = output
+
+        else:
+            separated = np.concatenate(separated, axis=0)
+
 
         import soundfile
         soundfile.write('temp.wav', separated, 44100)
