@@ -63,7 +63,7 @@ def PreTrainedLaSAFTNet(model_name='lasaft_large_2020'):
     ckpt = model_name + '.ckpt'
 
     if not os.path.exists(ckpt):
-        print('no cached checkpoint found.\nautomatic download!')
+        print('no cached checkpoint found.\nautomatic download! please wait until current download is finished')
         url = 'http://intelligence.korea.ac.kr/assets/' + model_name + '.ckpt'
         wget.download(url)
         print('successfully downloaded the pretrained model.')
