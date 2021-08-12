@@ -1,15 +1,11 @@
 from pathlib import Path
-from warnings import warn
 
 import hydra
 import museval
 import torch.cuda
-import wandb
-from hydra.utils import to_absolute_path
 from omegaconf import DictConfig
 from pytorch_lightning.loggers import WandbLogger
 
-from lasaft.pretrained import PreTrainedLaSAFTNet
 from lasaft.utils.functions import wandb_login
 from lasaft.utils.instantiator import HydraInstantiator as HI
 
@@ -42,6 +38,21 @@ def eval(cfg: DictConfig):
             if isinstance(logger, WandbLogger):
                 wandb_login(key=cfg['wandb_api_key'])
                 logger.watch(model, log='all')
+                hparams= {}
+                hparams["pretrained"] = cfg['pretrained']
+                hparams['overlap_ratio'] = cfg['overlap_ratio']
+                # save number of model parameters
+                hparams["model/params_total"] = sum(p.numel() for p in model.parameters())
+                hparams["model/params_trainable"] = sum(
+                    p.numel() for p in model.parameters() if p.requires_grad
+                )
+                hparams["model/params_not_trainable"] = sum(
+                    p.numel() for p in model.parameters() if not p.requires_grad
+                )
+
+                # send hparams to all loggers
+                logger.log_hyperparams(hparams)
+
     else:
         logger = None
 
@@ -103,6 +114,7 @@ def eval(cfg: DictConfig):
         logger.experiment.log(
             {'test_result/agg/{}_{}'.format(k1, k2): result_dict[(k1, k2)] for k1, k2 in result_dict.keys()}
         )
+        logger.close()
     else:
         print(results)
 

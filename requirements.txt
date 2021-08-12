@@ -1,6 +1,11 @@
+
 # --------- pytorch --------- #
-torch==1.9.0
-pytorch-lightning>=1.4.1
+torch==1.8.1
+pytorch-lightning>=1.3.2
+torchmetrics>=0.3.2
+onnxruntime
+onnxruntime-gpu
+onnx
 
 # --------- hydra --------- #
 hydra-core==1.1.0.rc1
@@ -38,6 +43,7 @@ pudb
 # --------- kuielab --------- #
 coloredlogs
 loguru
-musdb
-museval
+musdb==0.3.1
+museval==0.3.0
+pydub==0.24.1
 wget
