@@ -100,7 +100,7 @@ def eval(cfg: DictConfig):
                     .median().to_dict()
                 if isinstance(logger, WandbLogger):
                     logger.experiment.log(
-                        {'test_result/{}_{}'.format(k1, k2): score_dict[(k1, k2)] for k1, k2 in score_dict.keys()})
+                        {'test_result/{}_{}'.format(k1, k2): score_dict[(k1, k2)] for k1, k2 in score_dict.keys()}, step=idx)
                 else:
                     print(track_score)
                 results.add_track(track_score)
