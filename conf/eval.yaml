@@ -1,10 +1,12 @@
 defaults:
   - trainer: default
   - dataset: default
-  - model: conditioned_separation/lasaft_net
-  - training: default
-  - eval: default
   - logger: wandb
+  - pretrained: lasaft_large_2019
+
+gpus: 1
+batch_size: 8
+overlap_ratio: 0.5
 
 # pretty print config at the start of the run using Rich library
 print_config: True

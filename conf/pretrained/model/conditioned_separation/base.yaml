@@ -1,0 +1,22 @@
+# @package pretrained.model
+
+# SVS framework
+spec_type: complex
+spec_est_mode: mapping
+
+# DenseNet Hyper-params
+n_blocks: 7
+input_channels: 4
+internal_channels: 24
+first_conv_activation: relu
+last_activation: identity
+
+t_down_layers: null
+f_down_layers: null
+
+control_vector_type: embedding
+control_input_dim: 4
+embedding_dim: 32
+condition_to: decoder
+
+unfreeze_stft_from: -1 # -1 means never

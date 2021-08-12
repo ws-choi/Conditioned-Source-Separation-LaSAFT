@@ -1,0 +1,52 @@
+# @package pretrained.model
+
+defaults:
+  - /pretrained/model/conditioned_separation/CUNET_TFC_GPoCM_LaSAFT
+
+# FFT params
+n_fft: 4096
+hop_length: 1024
+num_frame: 128
+
+# SVS Framework
+spec_type: 'complex'
+spec_est_mode: 'mapping'
+
+# Other Hyper-params
+optimizer: 'adam'
+lr: 0.0001
+train_loss: 'spec_mse'
+val_loss: 'raw_l1'
+
+# DenseNet Hyper-params
+n_blocks: 9
+input_channels: 4
+internal_channels: 24
+first_conv_activation: 'relu'
+last_activation: 'identity'
+t_down_layers: null
+f_down_layers: null
+tif_init_mode: null
+
+# TFC_TDF Block's Hyper-params
+n_internal_layers: 5
+kernel_size_t: 3
+kernel_size_f: 3
+tfc_tdf_activation: 'relu'
+bn_factor: 16
+min_bn_units: 16
+tfc_tdf_bias: False
+num_tdfs: 6
+dk: 32
+
+control_vector_type: 'embedding'
+control_input_dim: 4
+embedding_dim: 64
+condition_to: 'decoder'
+
+control_n_layer: 4
+control_type: 'dense'
+pocm_type: 'matmul'
+pocm_norm: 'batch_norm'
+
+auto_lr_schedule: True

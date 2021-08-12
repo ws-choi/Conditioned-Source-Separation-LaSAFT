@@ -1,0 +1,18 @@
+# @package pretrained.model
+defaults:
+  - /pretrained/model/conditioned_separation/base
+  - /pretrained/model/conditioned_separation/gpocm
+_target_: lasaft.source_separation.conditioned.cunet.models.dcun_tfc_gpocm_lasaft.DCUN_TFC_GPoCM_LaSAFT_Framework
+
+n_internal_layers: 5
+
+kernel_size_t: 3
+kernel_size_f: 3
+
+bn_factor: 16
+min_bn_units: 16
+tfc_tdf_bias: False
+tfc_tdf_activation: relu
+
+num_tdfs: 6
+dk: 32
