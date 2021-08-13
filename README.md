@@ -246,19 +246,10 @@ training:
 ### 4. Evaluation
 
 ```
-python eval.py eval.run_id=[RUN_ID] 'eval.epoch=[EPOCH_CKPT]'
+python eval.py pretrained=lasaft_large_2021 overlap_ratio=0.5
 ```
 
-- example
-    - if you trained you model with the following script
-        ```
-        python train.py model=conditioned_separation/CUNET_TFC_FiLM dataset.batch_size=8 trainer=single_gpu training.lr=0.001 logger=wandb
-        ```
-    - suppose that its run_id = 2021-08-09/17-16-26
-    - then run eval scripts like below.
-        ```
-        python eval.py model=conditioned_separation/CUNET_TFC_FiLM eval.ckpt='outputs/2021-08-09/17-16-26/checkpoints/epoch\=00.ckpt' trainer.gpus=1
-        ```
+see result [here](https://wandb.ai/ws-choi/lasaft/reports/Inference-with-Overlapping-Sliding-window--Vmlldzo5MzA4NjI?accessToken=3lhvyk1cro6fzbl426jlfilezz1vq3zg0j35t5r4u3b14w5noti845prj8nlb08o)
 
 ## You can cite this paper as follows:
 
