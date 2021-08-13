@@ -50,7 +50,7 @@ We highly recommend you to **install environments using scripts below**, even if
 
 
 ```
-conda env create -f lasaft_env_gpu.yaml -n lasaft2
+conda env create -f lasaft_env_gpu.yaml -n lasaft
 conda activate lasaft
 pip install -r requirements.txt
 ```
