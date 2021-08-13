@@ -1,0 +1,9 @@
+defaults:
+  - model: conditioned_separation/lasaft_net_large
+
+ckpt: ${work_dir}/assets/lasaft_large_2020.ckpt
+
+ckpt_callback:
+  _target_: lasaft.utils.download_weights.get_lasaft_large
+  seed: 2020
+  save_path: ${work_dir}/assets/lasaft_large_2020.ckpt

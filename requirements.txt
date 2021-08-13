@@ -15,7 +15,6 @@ hydra-optuna-sweeper==1.1.0.dev2
 # hydra-ray-launcher==0.1.2
 # hydra-submitit-launcher==1.1.0
 
-
 # --------- loggers --------- #
 wandb>=0.10.30
 # neptune-client
@@ -42,6 +41,8 @@ pudb
 
 
 # --------- kuielab --------- #
+coloredlogs
+loguru
 musdb==0.3.1
 museval==0.3.0
 pydub==0.24.1

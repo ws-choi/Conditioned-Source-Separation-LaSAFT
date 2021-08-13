@@ -5,6 +5,7 @@ from warnings import warn
 import torch
 import torch.nn as nn
 from torch import Tensor
+from torch.utils.data import DataLoader
 
 from lasaft.data.musdb_wrapper import SingleTrackSet
 from lasaft.source_separation.conditioned.separation_framework import Spectrogram_based
@@ -250,7 +251,7 @@ class Dense_CUNet_Framework(Spectrogram_based):
 
         return restored, output_spec_cache
 
-    def separate_track(self, input_signal, target, overlap_ratio=0.5) -> torch.Tensor:
+    def separate_track(self, input_signal, target, overlap_ratio=0.5, batch_size=1) -> torch.Tensor:
 
         import numpy as np
 
@@ -262,19 +263,21 @@ class Dense_CUNet_Framework(Spectrogram_based):
             trim_length = get_trim_length(self.hop_length)
 
             db = SingleTrackSet(input_signal, window_length, trim_length, overlap_ratio)
+
             assert target in db.source_names
             separated = []
 
             input_condition = np.array(db.source_names.index(target))
             input_condition = torch.tensor(input_condition, dtype=torch.long, device=self.device).view(1)
 
-            for item, mask in db:
-                res = self.separate(item.unsqueeze(0).to(self.device), input_condition)[0]
+            for item, mask in DataLoader(db, batch_size):
+                res = self.separate(item.to(self.device), input_condition)
                 res = res * mask.to(self.device)
-                res = res[self.trim_length:-self.trim_length].detach().cpu().numpy()
+                res = res[:, self.trim_length:-self.trim_length].detach().cpu().numpy()
 
                 separated.append(res)
 
+        separated = np.concatenate(separated)
         if db.is_overlap:
             output = np.zeros_like(input_signal)
             hop_length = db.hop_length

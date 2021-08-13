@@ -16,6 +16,16 @@ class HydraInstantiator():
         return cls.instantiate(model_cfg, **kwargs)
 
     @classmethod
+    def pretrained(cls, cfg: DictConfig):
+
+        # Don't care args
+        kwargs = {
+            'train_loss': 'spec_mse',
+            'val_loss': 'spec_mse'
+        }
+        model_cfg = {**cfg['pretrained']['model'], **cls.remove_target(cfg['dataset'])}
+        return cls.instantiate(model_cfg, **kwargs)
+    @classmethod
     def train_loss(cls, cfg: DictConfig):
         loss_cfg = cfg['training']['train_loss']
         if ('window_length' in loss_cfg.keys()):

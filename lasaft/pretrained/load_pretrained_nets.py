@@ -61,7 +61,7 @@ def __define_large_params__():
 
 
 def PreTrainedLaSAFTNet(model_name='lasaft_large_2020'):
-    assert model_name in ['lasaft_large_2020', 'lasaft_large_2021']
+    assert model_name in ['lasaft_large_2019', 'lasaft_large_2020', 'lasaft_large_2021']
     ckpt = model_name + '.ckpt'
 
     if not os.path.exists(ckpt):

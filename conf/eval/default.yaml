@@ -1,3 +1,0 @@
-ckpt_root_path: 'checkpoints'
-log: True
-ckpt: null
