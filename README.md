@@ -87,7 +87,22 @@ We provide [wrapper packages](https://github.com/ws-choi/Conditioned-Source-Sepa
 
 You can also find [useful scripts](https://github.com/ws-choi/Conditioned-Source-Separation-LaSAFT/tree/main/lasaft/data) for downloading and preprocessing Musdb18 (or its 7s-samples).
 
-### 3. Training
+### 4. Logging (mandatory): wandb
+
+This project uses wandb. Currently, this setting is mandatory.
+
+To use this, you should copy your `wandb apy key` from [wandb](https://wandb.ai/settings)
+
+`wandb login -> settings -> Danger Zone -> API keys`
+
+Then please copy it and paste it to `.env` (there is a template file `./.env.sample` as below.).
+
+```
+wandb_api_key= [YOUR WANDB API KEY] # go wandb.ai/settings and copy your key
+data_dir= [Your MUSDBHQ Data PATH] # Your Musdb data directory. must be an absolute path.
+```
+
+### 5. Training
 
 - Below is an example to train a U-Net with LaSAFT+GPoCM, whose hyper-parameters are set as default.
     ```shell script
@@ -267,7 +282,7 @@ training:
   seed: 2020
 ```
 
-### 4. Evaluation
+### 5. Evaluation
 
 ```
 python eval.py pretrained=lasaft_large_2021 overlap_ratio=0.5
